@@ -6,6 +6,7 @@ import { obtenerHistorialCalculos, obtenerEstadisticasCalculos, toggleFavorito, 
 import { formatearCLP } from '@/lib/calculos';
 import Link from 'next/link';
 import Sidebar from '@/components/Sidebar';
+import { useRouter, useSearchParams } from 'next/navigation';
 
 interface Estadisticas {
   totalCalculos: number;
@@ -17,16 +18,30 @@ interface Estadisticas {
 
 export default function Dashboard() {
   const { user } = useAuth();
+  const router = useRouter();
+  const searchParams = useSearchParams();
   const [calculos, setCalculos] = useState<CalculoDB[]>([]);
   const [estadisticas, setEstadisticas] = useState<Estadisticas | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string>('');
+  const [showWelcomeMessage, setShowWelcomeMessage] = useState(false);
 
   useEffect(() => {
     if (user) {
       cargarDatos();
     }
   }, [user]);
+
+  useEffect(() => {
+    // Mostrar mensaje de bienvenida si viene del login
+    if (searchParams.get('login') === 'success') {
+      setShowWelcomeMessage(true);
+      // Limpiar el parámetro de la URL
+      router.replace('/dashboard');
+      // Ocultar el mensaje después de 5 segundos
+      setTimeout(() => setShowWelcomeMessage(false), 5000);
+    }
+  }, [searchParams, router]);
 
   const cargarDatos = async () => {
     try {
@@ -72,6 +87,17 @@ export default function Dashboard() {
     }
   };
 
+  if (!user) {
+    return (
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
+          <p className="text-gray-600">Cargando...</p>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="min-h-screen bg-gray-50">
       <Sidebar />
@@ -99,6 +125,23 @@ export default function Dashboard() {
 
         {/* Main content */}
         <main className="p-6">
+          {/* Mensaje de bienvenida */}
+          {showWelcomeMessage && (
+            <div className="mb-6 bg-gradient-to-r from-green-50 to-emerald-50 border border-green-200 rounded-2xl p-4 shadow-sm">
+              <div className="flex items-center space-x-3">
+                <div className="w-10 h-10 bg-green-100 rounded-full flex items-center justify-center">
+                  <svg className="w-5 h-5 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                  </svg>
+                </div>
+                <div>
+                  <h3 className="text-lg font-semibold text-green-800">¡Bienvenido de vuelta!</h3>
+                  <p className="text-green-700">Has iniciado sesión exitosamente. ¿Qué te gustaría calcular hoy?</p>
+                </div>
+              </div>
+            </div>
+          )}
+
           {/* Stats Grid */}
           {!isLoading && !error && estadisticas && (
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">

@@ -59,35 +59,72 @@ export default function Home() {
       <section className="relative overflow-hidden">
         <div className="container mx-auto px-4 py-20">
           <div className="max-w-4xl mx-auto text-center">
-            <h1 className="text-5xl md:text-7xl font-bold text-gray-900 mb-6 leading-tight">
-              Calcula tu{' '}
-              <span className="bg-gradient-to-r from-blue-600 to-indigo-600 bg-clip-text text-transparent">
-                valor real
-              </span>{' '}
-              como freelancer
-            </h1>
-            <p className="text-xl md:text-2xl text-gray-600 mb-8 leading-relaxed">
-              Descubre cuánto deberías cobrar considerando impuestos chilenos, 
-              gastos fijos y cotizaciones previsionales. 
-              <span className="font-semibold text-gray-800"> En segundos.</span>
-            </p>
-            <div className="flex flex-col sm:flex-row gap-4 justify-center">
-              <Link
-                href="/calculadora"
-                className="bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white px-8 py-4 rounded-2xl font-semibold text-lg transition-all duration-200 shadow-xl hover:shadow-2xl transform hover:-translate-y-1 inline-flex items-center justify-center"
-              >
-                <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
-                </svg>
-                Empezar gratis
-              </Link>
-              <Link
-                href="/auth"
-                className="bg-white hover:bg-gray-50 text-gray-700 px-8 py-4 rounded-2xl font-semibold text-lg transition-all duration-200 shadow-lg hover:shadow-xl border border-gray-200 inline-flex items-center justify-center"
-              >
-                Crear cuenta
-              </Link>
-            </div>
+            {user ? (
+              <>
+                <h1 className="text-5xl md:text-7xl font-bold text-gray-900 mb-6 leading-tight">
+                  ¡Bienvenido de vuelta,{' '}
+                  <span className="bg-gradient-to-r from-blue-600 to-indigo-600 bg-clip-text text-transparent">
+                    {user.user_metadata?.full_name?.split(' ')[0] || 'Freelancer'}!
+                  </span>
+                </h1>
+                <p className="text-xl md:text-2xl text-gray-600 mb-8 leading-relaxed">
+                  ¿Listo para calcular tu próxima tarifa o simular un proyecto? 
+                  <span className="font-semibold text-gray-800"> Accede a tu dashboard.</span>
+                </p>
+                <div className="flex flex-col sm:flex-row gap-4 justify-center">
+                  <button
+                    onClick={handleDashboardClick}
+                    className="bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white px-8 py-4 rounded-2xl font-semibold text-lg transition-all duration-200 shadow-xl hover:shadow-2xl transform hover:-translate-y-1 inline-flex items-center justify-center"
+                  >
+                    <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
+                    </svg>
+                    Ir al Dashboard
+                  </button>
+                  <Link
+                    href="/calculadora"
+                    className="bg-white hover:bg-gray-50 text-gray-700 px-8 py-4 rounded-2xl font-semibold text-lg transition-all duration-200 shadow-lg hover:shadow-xl border border-gray-200 inline-flex items-center justify-center"
+                  >
+                    <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
+                    </svg>
+                    Nuevo Cálculo
+                  </Link>
+                </div>
+              </>
+            ) : (
+              <>
+                <h1 className="text-5xl md:text-7xl font-bold text-gray-900 mb-6 leading-tight">
+                  Calcula tu{' '}
+                  <span className="bg-gradient-to-r from-blue-600 to-indigo-600 bg-clip-text text-transparent">
+                    valor real
+                  </span>{' '}
+                  como freelancer
+                </h1>
+                <p className="text-xl md:text-2xl text-gray-600 mb-8 leading-relaxed">
+                  Descubre cuánto deberías cobrar considerando impuestos chilenos, 
+                  gastos fijos y cotizaciones previsionales. 
+                  <span className="font-semibold text-gray-800"> En segundos.</span>
+                </p>
+                <div className="flex flex-col sm:flex-row gap-4 justify-center">
+                  <Link
+                    href="/calculadora"
+                    className="bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white px-8 py-4 rounded-2xl font-semibold text-lg transition-all duration-200 shadow-xl hover:shadow-2xl transform hover:-translate-y-1 inline-flex items-center justify-center"
+                  >
+                    <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
+                    </svg>
+                    Empezar gratis
+                  </Link>
+                  <Link
+                    href="/auth"
+                    className="bg-white hover:bg-gray-50 text-gray-700 px-8 py-4 rounded-2xl font-semibold text-lg transition-all duration-200 shadow-lg hover:shadow-xl border border-gray-200 inline-flex items-center justify-center"
+                  >
+                    Crear cuenta
+                  </Link>
+                </div>
+              </>
+            )}
           </div>
         </div>
         

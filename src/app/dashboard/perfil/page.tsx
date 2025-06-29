@@ -334,14 +334,16 @@ export default function PerfilPage() {
             <h2 className="text-xl font-semibold text-gray-900 mb-6">Preferencias de cálculo</h2>
             <div className="space-y-6">
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
+                <label className="block text-sm font-semibold text-gray-800 mb-3">
                   Rubro principal
-                  <span className="ml-1 text-gray-400" title="Este rubro se usa para las recomendaciones de tarifas del mercado">ⓘ</span>
+                  <span className="ml-2 inline-flex items-center justify-center w-4 h-4 bg-blue-100 text-blue-600 rounded-full text-xs font-normal" title="Este rubro se usa para las recomendaciones de tarifas del mercado">
+                    ⓘ
+                  </span>
                 </label>
                 <select
                   value={preferences.rubro}
                   onChange={(e) => setPreferences({...preferences, rubro: e.target.value})}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white text-gray-900 font-medium shadow-sm hover:border-gray-400 transition-colors"
                 >
                   <option value="Desarrollo Web">Desarrollo Web</option>
                   <option value="Diseño Gráfico">Diseño Gráfico</option>
@@ -351,33 +353,47 @@ export default function PerfilPage() {
                   <option value="Consultoría">Consultoría</option>
                   <option value="Otro">Otro</option>
                 </select>
+                <p className="mt-2 text-sm text-gray-600">Selecciona tu área principal de trabajo para obtener recomendaciones más precisas.</p>
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
+                <label className="block text-sm font-semibold text-gray-800 mb-3">
                   Años de experiencia
-                  <span className="ml-1 text-gray-400" title="Tu nivel de experiencia afecta las recomendaciones de tarifas">ⓘ</span>
+                  <span className="ml-2 inline-flex items-center justify-center w-4 h-4 bg-blue-100 text-blue-600 rounded-full text-xs font-normal" title="Tu nivel de experiencia afecta las recomendaciones de tarifas">
+                    ⓘ
+                  </span>
                 </label>
                 <select
                   value={preferences.experiencia}
                   onChange={(e) => setPreferences({...preferences, experiencia: e.target.value})}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white text-gray-900 font-medium shadow-sm hover:border-gray-400 transition-colors"
                 >
-                  <option value="0-1 años">0-1 años</option>
-                  <option value="1-3 años">1-3 años</option>
-                  <option value="3-5 años">3-5 años</option>
-                  <option value="5-10 años">5-10 años</option>
-                  <option value="10+ años">10+ años</option>
+                  <option value="0-1 años">0-1 años (Principiante)</option>
+                  <option value="1-3 años">1-3 años (Junior)</option>
+                  <option value="3-5 años">3-5 años (Mid-level)</option>
+                  <option value="5-10 años">5-10 años (Senior)</option>
+                  <option value="10+ años">10+ años (Experto)</option>
                 </select>
+                <p className="mt-2 text-sm text-gray-600">Tu experiencia profesional influye en las tarifas recomendadas del mercado.</p>
               </div>
 
-              <button
-                onClick={guardarPreferencias}
-                disabled={savingPreferences}
-                className="w-full bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white px-4 py-2 rounded-xl font-medium transition-all duration-200 disabled:opacity-50"
-              >
-                {savingPreferences ? 'Guardando...' : 'Guardar preferencias'}
-              </button>
+              <div className="pt-4 border-t border-gray-100">
+                <button
+                  onClick={guardarPreferencias}
+                  disabled={savingPreferences}
+                  className="w-full bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white px-6 py-3 rounded-xl font-semibold transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed shadow-sm hover:shadow-md transform hover:-translate-y-0.5"
+                >
+                  {savingPreferences ? (
+                    <div className="flex items-center justify-center space-x-2">
+                      <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+                      <span>Guardando...</span>
+                    </div>
+                  ) : (
+                    'Guardar preferencias'
+                  )}
+                </button>
+                <p className="mt-2 text-xs text-gray-500 text-center">Estas preferencias se usarán para personalizar tus cálculos y recomendaciones.</p>
+              </div>
             </div>
           </div>
         </div>
