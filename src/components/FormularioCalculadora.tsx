@@ -7,6 +7,7 @@ import { guardarCalculo } from '@/lib/supabase';
 import { useAuth } from '@/contexts/AuthContext';
 import Resultado from './Resultado';
 import { Tooltip } from 'react-tooltip';
+import { useSearchParams } from 'next/navigation';
 
 interface ErroresValidacion {
   ingresosDeseados?: string;
@@ -41,6 +42,7 @@ const CLIENTES = [
 ];
 
 export default function FormularioCalculadora() {
+  const searchParams = useSearchParams();
   const { user } = useAuth();
   const [datos, setDatos] = useState<DatosCalculoConTitulo>({
     ingresosDeseados: VALORES_DEFAULT.INGRESOS_DESEADOS,
@@ -69,6 +71,48 @@ export default function FormularioCalculadora() {
   });
   const [rubro, setRubro] = useState('diseño');
   const [experiencia, setExperiencia] = useState('junior');
+
+  // Inicializar desde query params si existen (solo en el primer render)
+  useEffect(() => {
+    // Modo (hora/proyecto)
+    const modo = searchParams.get('modo');
+    if (modo === 'proyecto') setModoProyecto(true);
+    if (modo === 'hora') setModoProyecto(false);
+
+    // Rubro y experiencia
+    const rubroParam = searchParams.get('rubro');
+    if (rubroParam) setRubro(rubroParam);
+    const experienciaParam = searchParams.get('experiencia');
+    if (experienciaParam) setExperiencia(experienciaParam);
+
+    // Datos modo hora
+    const ingresosDeseados = searchParams.get('ingresosDeseados');
+    const diasTrabajados = searchParams.get('diasTrabajados');
+    const horasPorDia = searchParams.get('horasPorDia');
+    const gastosFijos = searchParams.get('gastosFijos');
+    if (ingresosDeseados || diasTrabajados || horasPorDia || gastosFijos) {
+      setDatos(prev => ({
+        ...prev,
+        ingresosDeseados: ingresosDeseados ? Number(ingresosDeseados) : prev.ingresosDeseados,
+        diasTrabajados: diasTrabajados ? Number(diasTrabajados) : prev.diasTrabajados,
+        horasPorDia: horasPorDia ? Number(horasPorDia) : prev.horasPorDia,
+        gastosFijos: gastosFijos ? Number(gastosFijos) : prev.gastosFijos,
+      }));
+    }
+
+    // Datos modo proyecto
+    const presupuesto = searchParams.get('presupuesto');
+    const horasEstimadas = searchParams.get('horasEstimadas');
+    if (presupuesto || horasEstimadas) {
+      setProyecto(prev => ({
+        ...prev,
+        presupuesto: presupuesto || prev.presupuesto,
+        horasTotales: horasEstimadas || prev.horasTotales,
+      }));
+    }
+  // Solo en el primer render
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   // Validación en tiempo real
   const validarCampo = (campo: keyof typeof datos, valor: any): string | undefined => {
