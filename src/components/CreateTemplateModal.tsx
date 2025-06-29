@@ -100,43 +100,46 @@ export default function CreateTemplateModal({ isOpen, onClose, onCreate }: Creat
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-40">
-      <div className="bg-white rounded-2xl shadow-xl p-8 w-full max-w-lg relative">
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50 backdrop-blur-sm p-4">
+      <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-2xl p-6 w-full max-w-md relative">
         <button
           onClick={onClose}
-          className="absolute top-4 right-4 text-gray-400 hover:text-gray-700"
+          className="absolute top-4 right-4 text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200 transition-colors"
         >
           <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
           </svg>
         </button>
-        <h2 className="text-2xl font-bold mb-4">Crear Template Personalizado</h2>
+        <h2 className="text-xl font-bold mb-4 text-gray-900 dark:text-white">Crear Template Personalizado</h2>
         <form onSubmit={handleSubmit} className="space-y-4">
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">Nombre</label>
+            <label className="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-1">Nombre del Template</label>
             <input
               type="text"
               value={name}
               onChange={e => setName(e.target.value)}
               required
-              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+              className="w-full px-3 py-2 border-2 border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:text-white dark:placeholder-gray-400"
+              placeholder="Ej: Template para desarrollo web"
             />
           </div>
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">Descripción</label>
+            <label className="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-1">Descripción</label>
             <textarea
               value={description}
               onChange={e => setDescription(e.target.value)}
-              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+              className="w-full px-3 py-2 border-2 border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:text-white dark:placeholder-gray-400"
+              placeholder="Describe el propósito de este template"
+              rows={2}
             />
           </div>
-          <div className="grid grid-cols-2 gap-4">
+          <div className="grid grid-cols-2 gap-3">
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">Rubro</label>
+              <label className="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-1">Rubro</label>
               <select
                 value={rubro}
                 onChange={e => setRubro(e.target.value)}
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                className="w-full px-3 py-2 border-2 border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:text-white"
               >
                 {rubros.map(r => (
                   <option key={r} value={r}>{r}</option>
@@ -144,11 +147,11 @@ export default function CreateTemplateModal({ isOpen, onClose, onCreate }: Creat
               </select>
             </div>
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">Experiencia</label>
+              <label className="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-1">Experiencia</label>
               <select
                 value={experiencia}
                 onChange={e => setExperiencia(e.target.value)}
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                className="w-full px-3 py-2 border-2 border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:text-white"
               >
                 {experiencias.map(e => (
                   <option key={e} value={e}>{e}</option>
@@ -157,101 +160,129 @@ export default function CreateTemplateModal({ isOpen, onClose, onCreate }: Creat
             </div>
           </div>
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">Modo</label>
+            <label className="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-1">Tipo de Cálculo</label>
             <select
               value={modo}
               onChange={e => setModo(e.target.value as 'hora' | 'proyecto')}
-              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+              className="w-full px-3 py-2 border-2 border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:text-white"
             >
               <option value="hora">Tarifa por Hora</option>
               <option value="proyecto">Simular Proyecto</option>
             </select>
           </div>
           {modo === 'hora' ? (
-            <div className="grid grid-cols-2 gap-4">
+            <div className="grid grid-cols-2 gap-3">
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Ingresos deseados (CLP)</label>
+                <label className="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-1">Ingresos deseados (CLP)</label>
                 <input
                   type="number"
                   value={ingresosDeseados}
                   onChange={e => setIngresosDeseados(e.target.value)}
                   required
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg"
+                  className="w-full px-3 py-2 border-2 border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:text-white dark:placeholder-gray-400"
+                  placeholder="1500000"
                 />
               </div>
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Gastos fijos (CLP)</label>
+                <label className="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-1">Gastos fijos (CLP)</label>
                 <input
                   type="number"
                   value={gastosFijos}
                   onChange={e => setGastosFijos(e.target.value)}
                   required
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg"
+                  className="w-full px-3 py-2 border-2 border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:text-white dark:placeholder-gray-400"
+                  placeholder="300000"
                 />
               </div>
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Días trabajados/mes</label>
+                <label className="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-1">Días trabajados/mes</label>
                 <input
                   type="number"
                   value={diasTrabajados}
                   onChange={e => setDiasTrabajados(e.target.value)}
                   required
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg"
+                  className="w-full px-3 py-2 border-2 border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:text-white dark:placeholder-gray-400"
+                  placeholder="20"
                 />
               </div>
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Horas por día</label>
+                <label className="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-1">Horas por día</label>
                 <input
                   type="number"
                   value={horasPorDia}
                   onChange={e => setHorasPorDia(e.target.value)}
                   required
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg"
+                  className="w-full px-3 py-2 border-2 border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:text-white dark:placeholder-gray-400"
+                  placeholder="8"
                 />
               </div>
             </div>
           ) : (
-            <div className="grid grid-cols-2 gap-4">
+            <div className="grid grid-cols-2 gap-3">
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Presupuesto (CLP)</label>
+                <label className="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-1">Presupuesto (CLP)</label>
                 <input
                   type="number"
                   value={presupuesto}
                   onChange={e => setPresupuesto(e.target.value)}
                   required
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg"
+                  className="w-full px-3 py-2 border-2 border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:text-white dark:placeholder-gray-400"
+                  placeholder="1000000"
                 />
               </div>
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Horas estimadas</label>
+                <label className="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-1">Horas estimadas</label>
                 <input
                   type="number"
                   value={horasEstimadas}
                   onChange={e => setHorasEstimadas(e.target.value)}
                   required
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg"
+                  className="w-full px-3 py-2 border-2 border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:text-white dark:placeholder-gray-400"
+                  placeholder="40"
                 />
               </div>
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Gastos del proyecto (CLP)</label>
+                <label className="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-1">Gastos del proyecto (CLP)</label>
                 <input
                   type="number"
                   value={gastosProyecto}
                   onChange={e => setGastosProyecto(e.target.value)}
                   required
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg"
+                  className="w-full px-3 py-2 border-2 border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:text-white dark:placeholder-gray-400"
+                  placeholder="50000"
                 />
               </div>
             </div>
           )}
-          {error && <p className="text-red-600 text-sm">{error}</p>}
-          <div className="flex justify-end">
+          {error && (
+            <div className="bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg p-3">
+              <p className="text-red-600 dark:text-red-400 text-sm font-medium">{error}</p>
+            </div>
+          )}
+          <div className="flex justify-end gap-2 pt-2">
+            <button
+              type="button"
+              onClick={onClose}
+              className="px-4 py-2 border-2 border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 rounded-lg font-medium hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors"
+            >
+              Cancelar
+            </button>
             <button
               type="submit"
               disabled={loading}
-              className="bg-blue-600 text-white px-6 py-2 rounded-lg font-medium hover:bg-blue-700 transition-colors disabled:opacity-50"
+              className="bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white px-4 py-2 rounded-lg font-medium transition-all duration-200 shadow-lg hover:shadow-xl disabled:opacity-50 disabled:cursor-not-allowed"
             >
-              {loading ? 'Guardando...' : 'Crear Template'}
+              {loading ? (
+                <div className="flex items-center">
+                  <svg className="animate-spin -ml-1 mr-2 h-4 w-4 text-white" fill="none" viewBox="0 0 24 24">
+                    <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                    <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                  </svg>
+                  Guardando...
+                </div>
+              ) : (
+                'Crear Template'
+              )}
             </button>
           </div>
         </form>
