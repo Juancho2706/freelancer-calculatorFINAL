@@ -6,6 +6,7 @@ import { supabase } from '@/lib/supabase-config';
 import Sidebar from '@/components/Sidebar';
 import { formatearCLP } from '@/lib/calculos';
 import Link from 'next/link';
+import ResumenFlujoIngresos from '@/components/ResumenFlujoIngresos';
 
 interface Calculo {
   id: string;
@@ -309,6 +310,12 @@ export default function HistorialPage() {
                       </Link>
                     </div>
                   </div>
+                  <ResumenFlujoIngresos
+                    ingresosNetos={calculo.result.ingresosNetos}
+                    desglose={calculo.result.desglose}
+                    modoProyecto={calculo.modo === 'simular_proyecto'}
+                    ingresoBrutoOverride={calculo.modo === 'simular_proyecto' ? calculo.result.tarifaProyecto : undefined}
+                  />
                 </div>
               ))}
             </div>

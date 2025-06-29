@@ -13,7 +13,8 @@ import {
   getUserFavorites,
   incrementTemplateUsage,
   createCustomTemplate,
-  deleteTemplate
+  deleteTemplate,
+  updateTemplate
 } from '@/lib/templates';
 import CreateTemplateModal from '@/components/CreateTemplateModal';
 
@@ -27,6 +28,8 @@ export default function TemplatesPage() {
   const [filterModo, setFilterModo] = useState<string>('');
   const [searchTerm, setSearchTerm] = useState('');
   const [showCreateModal, setShowCreateModal] = useState(false);
+  const [editTemplate, setEditTemplate] = useState<CalculationTemplate | null>(null);
+  const [isEditModalOpen, setIsEditModalOpen] = useState(false);
 
   useEffect(() => {
     if (user) {
@@ -116,6 +119,18 @@ export default function TemplatesPage() {
     }
   };
 
+  const handleEditTemplate = (template: CalculationTemplate) => {
+    setEditTemplate(template);
+    setIsEditModalOpen(true);
+  };
+
+  const handleUpdateTemplate = async (templateId: string, updates: Partial<CalculationTemplate>) => {
+    await updateTemplate(templateId, updates);
+    setIsEditModalOpen(false);
+    setEditTemplate(null);
+    loadTemplates();
+  };
+
   const handleDeleteTemplate = async (templateId: string) => {
     if (confirm('¿Estás seguro de que quieres eliminar este template?')) {
       try {
@@ -194,9 +209,11 @@ export default function TemplatesPage() {
     <div className="min-h-screen bg-gray-50">
       <Sidebar />
       <CreateTemplateModal
-        isOpen={showCreateModal}
-        onClose={() => setShowCreateModal(false)}
+        isOpen={showCreateModal || isEditModalOpen}
+        onClose={() => { setShowCreateModal(false); setIsEditModalOpen(false); setEditTemplate(null); }}
         onCreate={handleCreateTemplate}
+        editTemplate={editTemplate}
+        onUpdate={handleUpdateTemplate}
       />
       <main className="p-6 lg:ml-64">
         <div className="max-w-7xl mx-auto">
@@ -390,6 +407,15 @@ export default function TemplatesPage() {
                             className="flex-1 bg-gradient-to-r from-green-600 to-emerald-600 hover:from-green-700 hover:to-emerald-700 text-white px-4 py-2 rounded-lg text-sm font-medium transition-all duration-200 shadow-sm hover:shadow-md transform hover:-translate-y-0.5"
                           >
                             Usar Template
+                          </button>
+                          <button
+                            onClick={() => handleEditTemplate(template)}
+                            className="p-2 text-blue-600 hover:bg-blue-100 rounded-lg transition-colors"
+                            title="Editar template"
+                          >
+                            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15.232 5.232l3.536 3.536M9 13l6-6m2 2l-6 6m-2 2h6" />
+                            </svg>
                           </button>
                           <button
                             onClick={() => handleDeleteTemplate(template.id)}

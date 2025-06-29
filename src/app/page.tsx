@@ -4,6 +4,7 @@ import { useAuth } from '@/contexts/AuthContext';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { useEffect } from 'react';
+import ResumenFlujoIngresos from '@/components/ResumenFlujoIngresos';
 
 export default function Home() {
   const { user } = useAuth();

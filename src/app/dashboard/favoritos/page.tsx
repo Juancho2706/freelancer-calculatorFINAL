@@ -6,6 +6,7 @@ import { supabase } from '@/lib/supabase-config';
 import Sidebar from '@/components/Sidebar';
 import { formatearCLP } from '@/lib/calculos';
 import Link from 'next/link';
+import ResumenFlujoIngresos from '@/components/ResumenFlujoIngresos';
 
 interface Calculo {
   id: string;
@@ -269,6 +270,12 @@ export default function FavoritosPage() {
                           </p>
                         </div>
                       </div>
+                      <ResumenFlujoIngresos
+                        ingresosNetos={calculo.result.ingresosNetos}
+                        desglose={calculo.result.desglose}
+                        modoProyecto={calculo.modo === 'simular_proyecto'}
+                        ingresoBrutoOverride={calculo.modo === 'simular_proyecto' ? calculo.result.tarifaProyecto : undefined}
+                      />
                     </div>
                     <div className="flex items-center space-x-2 ml-6">
                       <button onClick={() => toggleFavorito(calculo.id, calculo.favorito)} className="p-2 text-yellow-600 bg-yellow-50 rounded-lg hover:bg-yellow-100 transition-colors" title="Quitar de favoritos">

@@ -90,25 +90,42 @@ export default function FormularioCalculadora() {
     const diasTrabajados = searchParams.get('diasTrabajados');
     const horasPorDia = searchParams.get('horasPorDia');
     const gastosFijos = searchParams.get('gastosFijos');
-    if (ingresosDeseados || diasTrabajados || horasPorDia || gastosFijos) {
+    const nombreCompania = searchParams.get('nombreCompania');
+    const descripcionHora = searchParams.get('descripcion');
+    if (ingresosDeseados || diasTrabajados || horasPorDia || gastosFijos || nombreCompania || descripcionHora) {
       setDatos(prev => ({
         ...prev,
         ingresosDeseados: ingresosDeseados ? Number(ingresosDeseados) : prev.ingresosDeseados,
         diasTrabajados: diasTrabajados ? Number(diasTrabajados) : prev.diasTrabajados,
         horasPorDia: horasPorDia ? Number(horasPorDia) : prev.horasPorDia,
         gastosFijos: gastosFijos ? Number(gastosFijos) : prev.gastosFijos,
+        titulo: nombreCompania || descripcionHora || prev.titulo,
       }));
     }
 
     // Datos modo proyecto
     const presupuesto = searchParams.get('presupuesto');
     const horasEstimadas = searchParams.get('horasEstimadas');
-    if (presupuesto || horasEstimadas) {
+    const nombreProyecto = searchParams.get('nombreProyecto');
+    const descripcionProyecto = searchParams.get('descripcion');
+    const duracion = searchParams.get('duracion');
+    const entregables = searchParams.get('entregables');
+    const revisiones = searchParams.get('revisiones');
+    if (presupuesto || horasEstimadas || nombreProyecto || descripcionProyecto || duracion || entregables || revisiones) {
       setProyecto(prev => ({
         ...prev,
         presupuesto: presupuesto || prev.presupuesto,
         horasTotales: horasEstimadas || prev.horasTotales,
+        nombre: nombreProyecto || prev.nombre,
+        descripcion: descripcionProyecto || prev.descripcion,
+        duracion: duracion || prev.duracion,
+        entregables: entregables || prev.entregables,
+        revisiones: revisiones || prev.revisiones,
       }));
+      // Si hay nombreProyecto, úsalo como título del cálculo
+      if (nombreProyecto) {
+        setDatos(prev => ({ ...prev, titulo: nombreProyecto }));
+      }
     }
   // Solo en el primer render
   // eslint-disable-next-line react-hooks/exhaustive-deps

@@ -15,6 +15,7 @@ import { Doughnut, Bar } from 'react-chartjs-2';
 import { ResultadoCalculo, formatearCLP, convertirCLPaUSD } from '@/lib/calculos';
 import { VALORES_DEFAULT } from '@/utils/constants';
 import { Tooltip as ReactTooltip } from 'react-tooltip';
+import ResumenFlujoIngresos from './ResumenFlujoIngresos';
 
 // Registrar componentes de Chart.js
 ChartJS.register(
@@ -405,52 +406,105 @@ export default function Resultado({ resultado, datosOriginales, rubro, experienc
       </div>
 
       {/* Desglose detallado */}
-      <div className="bg-gray-50 rounded-xl p-6">
-        <h4 className="text-lg font-semibold text-gray-900 mb-4">
+      <div className="bg-gray-50 rounded-xl p-6 mt-8">
+        <h4 className="text-lg font-semibold text-gray-900 mb-4 flex items-center">
           Desglose detallado de impuestos y gastos
+          <span className="ml-2 cursor-pointer" data-tooltip-id="desglose-tip">?</span>
         </h4>
+        <ReactTooltip id="desglose-tip" place="right" content="Aquí puedes ver cómo se distribuyen tus ingresos entre impuestos, cotizaciones, gastos fijos y lo que realmente recibes (ingresos netos)." />
+        
+        {/* Resumen del flujo de ingresos */}
+        <ResumenFlujoIngresos
+          ingresosNetos={resultado.ingresosNetos}
+          desglose={resultado.desglose}
+          modoProyecto={modoProyecto}
+          ingresoBrutoOverride={modoProyecto ? resultado.tarifaProyecto : undefined}
+        />
         
         <div className="grid md:grid-cols-2 gap-6">
-          {/* Impuestos */}
+          {/* Impuestos y cotizaciones */}
           <div className="space-y-3">
-            <h5 className="font-medium text-gray-900 mb-3">Impuestos y Cotizaciones</h5>
-            
-            <div className="flex justify-between items-center p-3 bg-white rounded-lg">
-              <span className="text-gray-600">IVA (19%)</span>
+            <h5 className="font-medium text-gray-900 mb-3 flex items-center">
+              Impuestos y Cotizaciones
+              <span className="ml-2 cursor-pointer" data-tooltip-id="impuestos-tip">?</span>
+            </h5>
+            <ReactTooltip id="impuestos-tip" place="right" content="Impuestos y cotizaciones obligatorias en Chile para freelancers." />
+            <div className="flex justify-between items-center p-3 bg-white rounded-lg border-l-4 border-red-400">
+              <span className="text-gray-700 flex items-center">
+                IVA (19%)
+                <span className="ml-1 cursor-pointer" data-tooltip-id="iva-tip">
+                  <svg className="w-4 h-4 text-red-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10" strokeWidth="2" /><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 8v4m0 4h.01" /></svg>
+                </span>
+              </span>
               <span className="font-semibold text-red-600">{formatearCLP(resultado.desglose.iva)}</span>
+              <ReactTooltip id="iva-tip" place="right" content="Impuesto al Valor Agregado (19%) que debes agregar a tus servicios si emites factura." />
             </div>
-            
-            <div className="flex justify-between items-center p-3 bg-white rounded-lg">
-              <span className="text-gray-600">Retención (13.75%)</span>
-              <span className="font-semibold text-red-600">{formatearCLP(resultado.desglose.retencion)}</span>
+            <div className="flex justify-between items-center p-3 bg-white rounded-lg border-l-4 border-yellow-400">
+              <span className="text-gray-700 flex items-center">
+                Retención (13.75%)
+                <span className="ml-1 cursor-pointer" data-tooltip-id="retencion-tip">
+                  <svg className="w-4 h-4 text-yellow-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10" strokeWidth="2" /><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 8v4m0 4h.01" /></svg>
+                </span>
+              </span>
+              <span className="font-semibold text-yellow-600">{formatearCLP(resultado.desglose.retencion)}</span>
+              <ReactTooltip id="retencion-tip" place="right" content="Retención de honorarios (13.75%) que se descuenta automáticamente si emites boleta de honorarios." />
             </div>
-            
-            <div className="flex justify-between items-center p-3 bg-white rounded-lg">
-              <span className="text-gray-600">Cotización Salud (7%)</span>
-              <span className="font-semibold text-red-600">{formatearCLP(resultado.desglose.cotizacionSalud)}</span>
+            <div className="flex justify-between items-center p-3 bg-white rounded-lg border-l-4 border-blue-400">
+              <span className="text-gray-700 flex items-center">
+                Cotización Salud (7%)
+                <span className="ml-1 cursor-pointer" data-tooltip-id="salud-tip">
+                  <svg className="w-4 h-4 text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10" strokeWidth="2" /><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 8v4m0 4h.01" /></svg>
+                </span>
+              </span>
+              <span className="font-semibold text-blue-600">{formatearCLP(resultado.desglose.cotizacionSalud)}</span>
+              <ReactTooltip id="salud-tip" place="right" content="Cotización obligatoria de salud (7%) sobre tus ingresos brutos." />
+            </div>
+            <div className="flex justify-between items-center p-3 bg-gray-50 rounded-lg border-l-4 border-red-500 mt-4">
+              <span className="text-gray-900 font-semibold flex items-center">
+                Total impuestos y cotizaciones
+                <span className="ml-1 cursor-pointer" data-tooltip-id="totalimp-tip">
+                  <svg className="w-4 h-4 text-red-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10" strokeWidth="2" /><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 8v4m0 4h.01" /></svg>
+                </span>
+              </span>
+              <span className="font-bold text-red-500">{formatearCLP(resultado.desglose.iva + resultado.desglose.retencion + resultado.desglose.cotizacionSalud)}</span>
+              <ReactTooltip id="totalimp-tip" place="right" content="Suma de todos los impuestos y cotizaciones obligatorias." />
             </div>
           </div>
-
           {/* Gastos y resultado */}
           <div className="space-y-3">
-            <h5 className="font-medium text-gray-900 mb-3">Gastos y Resultado</h5>
-            
-            <div className="flex justify-between items-center p-3 bg-white rounded-lg">
-              <span className="text-gray-600">Gastos fijos</span>
-              <span className="font-semibold text-orange-600">{formatearCLP(resultado.desglose.gastosFijos)}</span>
-            </div>
-            
-            <div className="flex justify-between items-center p-3 bg-white rounded-lg">
-              <span className="text-gray-600">Total impuestos</span>
-              <span className="font-semibold text-red-600">
-                {formatearCLP(resultado.desglose.iva + resultado.desglose.retencion + resultado.desglose.cotizacionSalud)}
+            <h5 className="font-medium text-gray-900 mb-3 flex items-center">
+              Gastos fijos
+              <span className="ml-2 cursor-pointer" data-tooltip-id="gastos-tip">?</span>
+            </h5>
+            <ReactTooltip id="gastos-tip" place="right" content="Gastos mensuales que debes cubrir (ej: arriendo, internet, software, etc)." />
+            <div className="flex justify-between items-center p-3 bg-white rounded-lg border-l-4 border-orange-400">
+              <span className="text-gray-700 flex items-center">
+                Gastos fijos
+                <span className="ml-1 cursor-pointer" data-tooltip-id="gastosfijos-tip">
+                  <svg className="w-4 h-4 text-orange-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10" strokeWidth="2" /><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 8v4m0 4h.01" /></svg>
+                </span>
               </span>
+              <span className="font-semibold text-orange-600">{formatearCLP(resultado.desglose.gastosFijos)}</span>
+              <ReactTooltip id="gastosfijos-tip" place="right" content="Gastos fijos mensuales que debes cubrir para mantener tu actividad como freelancer." />
             </div>
-            
+            <div className="flex justify-between items-center p-3 bg-gray-50 rounded-lg border-l-4 border-orange-500 mt-4">
+              <span className="text-gray-900 font-semibold flex items-center">
+                Total gastos (impuestos + gastos fijos)
+                <span className="ml-1 cursor-pointer" data-tooltip-id="totalgastos-tip">
+                  <svg className="w-4 h-4 text-orange-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10" strokeWidth="2" /><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 8v4m0 4h.01" /></svg>
+                </span>
+              </span>
+              <span className="font-bold text-orange-500">{formatearCLP(resultado.desglose.iva + resultado.desglose.retencion + resultado.desglose.cotizacionSalud + resultado.desglose.gastosFijos)}</span>
+              <ReactTooltip id="totalgastos-tip" place="right" content="Suma de todos los impuestos, cotizaciones y tus gastos fijos mensuales." />
+            </div>
             <hr className="border-gray-300" />
-            
-            <div className="flex justify-between items-center p-3 bg-green-50 rounded-lg">
-              <span className="text-lg font-semibold text-gray-900">Ingresos netos</span>
+            <div className="flex justify-between items-center p-3 bg-green-50 rounded-lg border-l-4 border-green-500 mt-2">
+              <span className="text-lg font-semibold text-gray-900 flex items-center">
+                Ingresos netos
+                <span className="ml-1 cursor-pointer" data-tooltip-id="netos-tip">
+                  <svg className="w-4 h-4 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10" strokeWidth="2" /><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 8v4m0 4h.01" /></svg>
+                </span>
+              </span>
               <div className="text-right">
                 <span className="text-2xl font-bold text-green-600 block">
                   {formatearCLP(resultado.ingresosNetos)}
@@ -459,6 +513,7 @@ export default function Resultado({ resultado, datosOriginales, rubro, experienc
                   ≈ ${ingresosNetosUSD.toFixed(2)} USD
                 </span>
               </div>
+              <ReactTooltip id="netos-tip" place="right" content="Lo que realmente recibes después de impuestos y gastos. Este es tu ingreso disponible." />
             </div>
           </div>
         </div>
