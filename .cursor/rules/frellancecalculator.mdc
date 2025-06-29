@@ -1,0 +1,82 @@
+---
+description: 
+globs: 
+alwaysApply: true
+---
+---
+description: Reglas específicas para el desarrollo de la "Calculadora de Precios para Freelancers Chilenos" usando Next.js y Supabase.
+applies_to:
+  - "**/*.js"
+  - "**/*.jsx"
+  - "**/*.ts"
+  - "**/*.tsx"
+---
+
+# Reglas de Desarrollo para Calculadora Freelancer Chile
+
+## Contexto del Proyecto
+
+Este proyecto es una "Calculadora de Precios para Freelancers Chilenos". Su objetivo es ayudar a los freelancers a calcular tarifas por hora/proyecto, considerando variables como:
+- Ingresos deseados
+- Días trabajados al mes
+- Gastos fijos
+- Impuestos locales chilenos (IVA 19%, Retención 13.75% para boletas de honorarios, etc.)
+- Cotizaciones previsionales (salud 7%)
+
+La aplicación debe ser intuitiva, fácil de usar y con una interfaz limpia.
+
+## Stack Tecnológico
+
+-   **Frontend**: Next.js (preferentemente App Router), React, TypeScript.
+-   **Estilos**: Tailwind CSS.
+-   **Backend**: Supabase (PostgreSQL para DB, Auth para autenticación, Storage si se requiere).
+-   **Hosting**: Vercel.
+-   **Pagos**: Transbank Webpay Plus (SDK oficial o integración directa).
+
+## Directrices Generales de Código
+
+1.  **Claridad y Legibilidad**: Escribe código limpio, bien comentado y fácil de entender.
+2.  **Modularidad**: Divide el código en componentes pequeños y reutilizables (especialmente en React).
+3.  **Rendimiento**: Optimiza el rendimiento de la aplicación, especialmente en los cálculos y la carga de datos.
+4.  **Seguridad**: Asegura que todas las interacciones con Supabase sean seguras y que la lógica de pagos proteja los datos del usuario.
+5.  **Internacionalización (i18n)**: Prepara el código para futuras traducciones o adaptaciones a otros mercados latinos (aunque el foco inicial es Chile).
+6.  **Manejo de Errores**: Implementa un manejo robusto de errores en el frontend y backend.
+7.  **UX/UI**: Prioriza la experiencia de usuario y la interfaz de usuario. Los diseños deben ser modernos y responsivos.
+
+## Reglas Específicas para Componentes y Funcionalidades
+
+### Cálculo de Tarifas (`lib/calculos.js`)
+-   Las funciones de cálculo deben ser puras (sin efectos secundarios).
+-   Los parámetros de entrada y salida deben ser claramente definidos.
+-   Debe considerar el 19% de IVA para los servicios, así como la retención de boletas de honorarios (actualmente 13.75% proyectado para 2025).
+-   Debe incluir el 7% de cotización de salud obligatoria.
+-   Considerar la conversión de CLP a USD para la visualización (usar una API de tipo de cambio fiable).
+
+### Interfaz de Usuario
+-   Utiliza componentes de formularios controlados en React.
+-   Muestra mensajes de validación claros al usuario.
+-   La visualización de resultados debe ser atractiva, con desglose de costos y gráficos si es posible (e.g., con Chart.js).
+-   El diseño debe ser mobile-first.
+
+### Integración con Supabase
+-   Utiliza el SDK oficial de Supabase para todas las interacciones de base de datos y autenticación.
+-   Protege las rutas de la API con autenticación de Supabase (middleware).
+-   Almacena solo los datos esenciales y anonimiza la información sensible.
+
+### Sistema de Pagos (Transbank Webpay)
+-   Implementa la integración de Webpay de forma segura, siguiendo las mejores prácticas de Transbank.
+-   Maneja correctamente los estados de las transacciones (exitosa, fallida, pendiente).
+-   Asegura la actualización del estado de la suscripción del usuario en Supabase después de un pago exitoso.
+
+### Autenticación
+-   Permite autenticación por email/contraseña y, si es posible, con Google.
+-   Gestiona correctamente el estado de la sesión del usuario en Next.js.
+
+### Consideraciones Futuras (para futuras iteraciones)
+-   Implementación de webhooks para Transbank.
+-   Exportación a PDF de los resultados y propuestas.
+-   Sistema de notificaciones por email.
+-   Integración con una API de tipo de cambio en tiempo real más robusta.
+-   Módulo para comparar tarifas por rubro.
+
+

@@ -1,36 +1,84 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Calculadora de Precios para Freelancers Chilenos
 
-## Getting Started
+Una aplicación web completa que ayuda a freelancers chilenos a calcular sus tarifas por hora y proyecto, considerando todos los impuestos y gastos locales.
 
-First, run the development server:
+## 🎯 ¿Qué hace esta aplicación?
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
-```
+### Calculadora Inteligente
+- **Cálculo automático** de tarifas por hora y proyecto
+- **Considera impuestos chilenos**: IVA 19%, retención 13.75% para boletas de honorarios
+- **Cotizaciones previsionales**: salud 7% obligatorio
+- **Gastos fijos**: incluye todos tus gastos mensuales en el cálculo
+- **Visualización clara**: gráficos y desglose detallado de costos
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+### Sistema de Usuarios
+- **Registro e inicio de sesión** con email o Google
+- **Dashboard personalizado** con estadísticas de tus cálculos
+- **Historial completo** de todos tus cálculos
+- **Sistema de favoritos** para marcar cálculos importantes
+- **Perfil de usuario** con gestión de cuenta
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+### Funcionalidades Avanzadas
+- **Exportación a PDF** de resultados y propuestas
+- **Búsqueda y filtros** en el historial
+- **Navegación intuitiva** entre todas las secciones
+- **Diseño responsive** que funciona en móviles y desktop
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+## 🚀 ¿Qué viene a futuro?
 
-## Learn More
+### Próximas Funcionalidades
+- **Sistema de pagos** integrado con Transbank Webpay
+- **Plantillas de propuestas** personalizables
+- **Comparación de tarifas** por rubro y experiencia
+- **API de tipo de cambio** en tiempo real (CLP/USD)
+- **Notificaciones por email** de nuevos cálculos
 
-To learn more about Next.js, take a look at the following resources:
+### Mejoras Planificadas
+- **Múltiples monedas** (USD, EUR, etc.)
+- **Webhooks** para integraciones externas
+- **Exportación avanzada** con plantillas personalizadas
+- **Sistema de recomendaciones** basado en tu industria
+- **Módulo de facturación** automática
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+### Características Adicionales
+- **Modo oscuro** automático
+- **Aplicación móvil** nativa
+- **Integración con contadores** chilenos
+- **Sistema de recordatorios** para cotizaciones previsionales
+- **Análisis de mercado** por rubro
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+## 🛠️ Tecnologías Utilizadas
 
-## Deploy on Vercel
+- **Frontend**: Next.js, React, TypeScript
+- **Estilos**: Tailwind CSS
+- **Backend**: Supabase (PostgreSQL, Auth)
+- **Hosting**: Vercel
+- **Gráficos**: Chart.js
+- **PDF**: jsPDF
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+## 📱 ¿Cómo usar la aplicación?
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+1. **Regístrate** con tu email o cuenta de Google
+2. **Completa el formulario** con tus datos (ingresos deseados, días trabajados, gastos)
+3. **Obtén tu tarifa** calculada automáticamente
+4. **Guarda y revisa** tus cálculos en el dashboard
+5. **Exporta** tus resultados a PDF
+
+## 🎨 Características de UX
+
+- **Interfaz moderna** y fácil de usar
+- **Cálculos en tiempo real** mientras escribes
+- **Mensajes de ayuda** y tooltips informativos
+- **Animaciones suaves** y transiciones
+- **Accesibilidad completa** para todos los usuarios
+
+## 🔒 Seguridad y Privacidad
+
+- **Datos protegidos** con autenticación robusta
+- **Información encriptada** en la base de datos
+- **Cumplimiento** con regulaciones chilenas
+- **Sin almacenamiento** de información sensible innecesaria
+
+---
+
+**Desarrollado específicamente para freelancers chilenos, considerando la legislación local vigente.**
