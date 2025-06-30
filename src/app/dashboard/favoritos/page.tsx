@@ -7,6 +7,7 @@ import Sidebar from '@/components/Sidebar';
 import { formatearCLP } from '@/lib/calculos';
 import Link from 'next/link';
 import ResumenFlujoIngresos from '@/components/ResumenFlujoIngresos';
+import MultiCurrencyDisplay from '@/components/MultiCurrencyDisplay';
 
 interface Calculo {
   id: string;

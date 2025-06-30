@@ -9,6 +9,7 @@ import Sidebar from '@/components/Sidebar';
 import { useRouter, useSearchParams } from 'next/navigation';
 import RemindersWidget from '@/components/RemindersWidget';
 import TemplatesWidget from '@/components/TemplatesWidget';
+import DolarLiveWidget from '@/components/DolarLiveWidget';
 import { supabase } from '@/lib/supabase-config';
 
 interface Estadisticas {
@@ -311,6 +312,11 @@ export default function Dashboard() {
             
             {/* Templates Widget */}
             <TemplatesWidget maxItems={3} showRecommended={true} />
+          </div>
+
+          {/* Widget del Dólar */}
+          <div className="mb-8">
+            <DolarLiveWidget showHistory={true} />
           </div>
 
           {/* Acciones rápidas */}

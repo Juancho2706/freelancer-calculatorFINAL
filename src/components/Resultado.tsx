@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useRef } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import {
   Chart as ChartJS,
   ArcElement,
@@ -16,6 +16,8 @@ import { ResultadoCalculo, formatearCLP, convertirCLPaUSD } from '@/lib/calculos
 import { VALORES_DEFAULT } from '@/utils/constants';
 import { Tooltip as ReactTooltip } from 'react-tooltip';
 import ResumenFlujoIngresos from './ResumenFlujoIngresos';
+import { obtenerTarifaEspecifica } from '@/lib/apis';
+import MultiCurrencyDisplay from './MultiCurrencyDisplay';
 
 // Registrar componentes de Chart.js
 ChartJS.register(
@@ -59,47 +61,99 @@ interface ResultadoProps {
   };
 }
 
-// Tarifas sugeridas de ejemplo (puedes mejorar con datos reales)
-const TARIFAS_SUGERIDAS: Record<string, Record<string, { min: number; prom: number; max: number }>> = {
-  diseño: {
-    junior: { min: 8000, prom: 12000, max: 18000 },
-    semi: { min: 12000, prom: 18000, max: 25000 },
-    senior: { min: 18000, prom: 25000, max: 35000 },
-  },
-  desarrollo: {
-    junior: { min: 10000, prom: 15000, max: 22000 },
-    semi: { min: 15000, prom: 22000, max: 32000 },
-    senior: { min: 22000, prom: 32000, max: 45000 },
-  },
-  marketing: {
-    junior: { min: 7000, prom: 11000, max: 16000 },
-    semi: { min: 11000, prom: 16000, max: 22000 },
-    senior: { min: 16000, prom: 22000, max: 30000 },
-  },
-  redaccion: {
-    junior: { min: 6000, prom: 9000, max: 14000 },
-    semi: { min: 9000, prom: 14000, max: 20000 },
-    senior: { min: 14000, prom: 20000, max: 28000 },
-  },
-  consultoria: {
-    junior: { min: 12000, prom: 18000, max: 25000 },
-    semi: { min: 18000, prom: 25000, max: 35000 },
-    senior: { min: 25000, prom: 35000, max: 50000 },
-  },
-  otro: {
-    junior: { min: 8000, prom: 12000, max: 18000 },
-    semi: { min: 12000, prom: 18000, max: 25000 },
-    senior: { min: 18000, prom: 25000, max: 35000 },
-  },
+// Mapeo de íconos para monedas
+const currencyIcons: Record<string, string> = {
+  CLP: '🇨🇱',
+  USD: '🇺🇸',
+  EUR: '🇪🇺',
+  UF: '💱',
+  UTM: '💱',
+  BTC: '₿',
 };
 
 export default function Resultado({ resultado, datosOriginales, rubro, experiencia, modoProyecto, proyecto }: ResultadoProps) {
-  // Calcular valores en USD
-  const tarifaHoraUSD = convertirCLPaUSD(resultado.tarifaHora);
-  const tarifaProyectoUSD = convertirCLPaUSD(resultado.tarifaProyecto);
-  const ingresosNetosUSD = convertirCLPaUSD(resultado.ingresosNetos);
+  const [tarifaSugerida, setTarifaSugerida] = useState<{
+    min: number;
+    prom: number;
+    max: number;
+    fecha_actualizacion: string;
+  } | null>(null);
+  const [conversionUSD, setConversionUSD] = useState<{
+    usd: number;
+    tipoCambio: number;
+    fecha: string;
+    fuente: string;
+  } | null>(null);
+  const [isLoading, setIsLoading] = useState(true);
+  // Estado para monedas
+  const [currencies, setCurrencies] = useState<any[]>([]);
+  const [selectedCurrency, setSelectedCurrency] = useState<any | null>(null);
+  const [loadingCurrencies, setLoadingCurrencies] = useState(true);
 
-  const sugeridas = TARIFAS_SUGERIDAS[rubro]?.[experiencia] || { min: 0, prom: 0, max: 0 };
+  useEffect(() => {
+    const cargarDatosExternos = async () => {
+      try {
+        // Cargar tarifa sugerida del mercado
+        const tarifaMercado = await obtenerTarifaEspecifica(rubro, experiencia);
+        if (tarifaMercado) {
+          setTarifaSugerida({
+            min: tarifaMercado.min,
+            prom: tarifaMercado.promedio,
+            max: tarifaMercado.max,
+            fecha_actualizacion: tarifaMercado.fecha_actualizacion,
+          });
+        }
+
+        // Cargar conversión a USD
+        const conversion = await convertirCLPaUSD(resultado.tarifaHora);
+        setConversionUSD(conversion);
+      } catch (error) {
+        console.warn('Error cargando datos externos:', error);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    cargarDatosExternos();
+  }, [resultado.tarifaHora, rubro, experiencia]);
+
+  useEffect(() => {
+    async function fetchCurrencies() {
+      setLoadingCurrencies(true);
+      const supabaseModule = await import('@/lib/supabase-config');
+      const supabase = supabaseModule.supabase;
+      const { data, error } = await supabase
+        .from('exchange_rates')
+        .select('*')
+        .eq('target_currency', 'CLP')
+        .order('base_currency', { ascending: true });
+      const now = new Date().toISOString();
+      let monedas = data || [];
+      // Agregar CLP manualmente como opción
+      monedas = [
+        { base_currency: 'CLP', target_currency: 'CLP', rate: 1, fetched_at: now },
+        ...monedas
+      ];
+      setCurrencies(monedas);
+      setSelectedCurrency(monedas[0] || null);
+      setLoadingCurrencies(false);
+    }
+    fetchCurrencies();
+  }, []);
+
+  // Función para convertir CLP a la moneda seleccionada
+  const convertir = (valorCLP: number) => {
+    if (!selectedCurrency) return valorCLP.toLocaleString('es-CL') + ' CLP';
+    const valor = valorCLP / selectedCurrency.rate;
+    return valor.toLocaleString('es-CL', { maximumFractionDigits: 2 }) + ' ' + selectedCurrency.base_currency;
+  };
+
+  // Calcular valores en USD usando los datos ya cargados
+  const tarifaHoraUSD = conversionUSD?.usd || 0;
+  const tarifaProyectoUSD = conversionUSD ? (resultado.tarifaProyecto * conversionUSD.usd / resultado.tarifaHora) : 0;
+  const ingresosNetosUSD = conversionUSD ? (resultado.ingresosNetos * conversionUSD.usd / resultado.tarifaHora) : 0;
+
+  const sugeridas = tarifaSugerida || { min: 0, prom: 0, max: 0 };
 
   // Datos para el gráfico de torta
   const chartData = {
@@ -219,16 +273,45 @@ export default function Resultado({ resultado, datosOriginales, rubro, experienc
   return (
     <div className="bg-white rounded-2xl shadow-xl p-8 animate-fade-in">
       <ReactTooltip id="tooltip" />
-      {/* Header con estado de éxito */}
-      <div className="flex items-center justify-between mb-8">
-        <h3 className="text-2xl font-semibold text-gray-900">
-          Resultados del cálculo
-        </h3>
-        <div className="bg-green-100 text-green-800 px-3 py-1 rounded-full text-sm font-medium flex items-center">
-          <svg className="w-4 h-4 mr-1" fill="currentColor" viewBox="0 0 20 20">
-            <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
-          </svg>
-          Cálculo completado
+      {/* Header con estado de éxito y selector de moneda */}
+      <div className="flex flex-col md:flex-row md:items-center md:justify-between mb-8 gap-4">
+        <div className="flex items-center gap-4">
+          <h3 className="text-2xl font-semibold text-gray-900">
+            Resultados del cálculo
+          </h3>
+          <div className="bg-green-100 text-green-800 px-3 py-1 rounded-full text-sm font-medium flex items-center">
+            <svg className="w-4 h-4 mr-1" fill="currentColor" viewBox="0 0 20 20">
+              <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
+            </svg>
+            Cálculo completado
+          </div>
+        </div>
+        {/* Selector de moneda global */}
+        <div className="flex items-center gap-2">
+          <label className="text-sm font-medium text-gray-700 mr-2">Moneda:</label>
+          <div className="relative">
+            <select
+              className="border border-blue-300 rounded-lg px-3 py-2 text-base font-semibold focus:ring-2 focus:ring-blue-400 focus:outline-none transition-all shadow-sm bg-white pr-10 text-black dark:text-white appearance-none"
+              value={selectedCurrency?.base_currency || ''}
+              onChange={e => setSelectedCurrency(currencies.find(c => c.base_currency === e.target.value))}
+              disabled={loadingCurrencies || currencies.length === 0}
+            >
+              {currencies.map((c) => (
+                <option key={c.base_currency} value={c.base_currency} className="text-black dark:text-white bg-white dark:bg-gray-800">
+                  {currencyIcons[c.base_currency] ? `${currencyIcons[c.base_currency]} ` : ''}{c.base_currency}
+                </option>
+              ))}
+            </select>
+            {/* Ícono de la moneda seleccionada sobre el select */}
+            {selectedCurrency && (
+              <span className="absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none text-xl">
+                {currencyIcons[selectedCurrency.base_currency] || ''}
+              </span>
+            )}
+          </div>
+          {selectedCurrency && (
+            <span className="text-xs text-gray-500 ml-2">1 {currencyIcons[selectedCurrency.base_currency] ? `${currencyIcons[selectedCurrency.base_currency]} ` : ''}{selectedCurrency.base_currency} = {selectedCurrency.rate.toLocaleString('es-CL')} CLP</span>
+          )}
         </div>
       </div>
 
@@ -260,10 +343,7 @@ export default function Resultado({ resultado, datosOriginales, rubro, experienc
           </h4>
           <ReactTooltip id="th-tip" place="right" content={modoProyecto ? "La tarifa por hora que obtienes con el presupuesto del proyecto." : "La tarifa mínima que deberías cobrar por cada hora de trabajo para alcanzar tus objetivos."} />
           <p className="text-3xl font-bold text-blue-600 mb-2">
-            {formatearCLP(resultado.tarifaHora)}
-          </p>
-          <p className="text-lg text-blue-700">
-            ≈ ${tarifaHoraUSD.toFixed(2)} USD
+            {convertir(resultado.tarifaHora)}
           </p>
           <p className="text-sm text-gray-600 mt-2">
             {modoProyecto 
@@ -281,14 +361,11 @@ export default function Resultado({ resultado, datosOriginales, rubro, experienc
           </h4>
           <ReactTooltip id="tp-tip" place="right" content={modoProyecto ? "Precio total del proyecto según el presupuesto ingresado o recomendado." : "Precio recomendado para un proyecto estándar de 40 horas. Si usas el modo proyecto, se ajusta a tus datos."} />
           <p className="text-3xl font-bold text-green-600 mb-2">
-            {formatearCLP(resultado.tarifaProyecto)}
-          </p>
-          <p className="text-lg text-green-700">
-            ≈ ${tarifaProyectoUSD.toFixed(2)} USD
+            {convertir(resultado.tarifaProyecto)}
           </p>
           <p className="text-sm text-gray-600 mt-2">
             {modoProyecto && proyecto.presupuesto
-              ? `Presupuesto ingresado: ${formatearCLP(Number(proyecto.presupuesto))}`
+              ? `Presupuesto ingresado: ${convertir(Number(proyecto.presupuesto))}`
               : modoProyecto 
                 ? 'Precio recomendado basado en tu tarifa por hora'
                 : 'Proyecto estándar de una semana laboral'
@@ -311,10 +388,10 @@ export default function Resultado({ resultado, datosOriginales, rubro, experienc
             <div className="text-center">
               <p className="text-sm text-gray-600 mb-1">Precio recomendado</p>
               <p className="text-xl font-bold text-purple-600">
-                {formatearCLP(resultado.proyecto.precioRecomendado)}
+                {convertir(resultado.proyecto.precioRecomendado)}
               </p>
               <p className="text-xs text-gray-500 mt-1">
-                Basado en tu tarifa por hora de {formatearCLP(resultado.proyecto.tarifaHoraNecesaria)}
+                Basado en tu tarifa por hora de {convertir(resultado.proyecto.tarifaHoraNecesaria)}
               </p>
             </div>
             
@@ -323,7 +400,7 @@ export default function Resultado({ resultado, datosOriginales, rubro, experienc
                 <div className="text-center">
                   <p className="text-sm text-gray-600 mb-1">Ganancia/Perdida</p>
                   <p className={`text-xl font-bold ${resultado.proyecto.ganancia >= 0 ? 'text-green-600' : 'text-red-600'}`}>
-                    {resultado.proyecto.ganancia >= 0 ? '+' : ''}{formatearCLP(resultado.proyecto.ganancia)}
+                    {resultado.proyecto.ganancia >= 0 ? '+' : ''}{convertir(resultado.proyecto.ganancia)}
                   </p>
                   <p className="text-xs text-gray-500 mt-1">
                     {resultado.proyecto.ganancia >= 0 ? 'Ganancia' : 'Pérdida'} vs precio recomendado
@@ -374,13 +451,13 @@ export default function Resultado({ resultado, datosOriginales, rubro, experienc
         <ReactTooltip id="comp-tip" place="right" content="Tarifas mínimas, promedio y máximas recomendadas para tu rubro y experiencia." />
         <div className="flex flex-wrap gap-4">
           <span className="inline-flex items-center px-3 py-1 rounded-full bg-gray-100 text-gray-700 text-sm font-medium">
-            Mínima: <b className="ml-1">{formatearCLP(sugeridas.min)}</b>
+            Mínima: <b className="ml-1">{convertir(sugeridas.min)}</b>
           </span>
           <span className="inline-flex items-center px-3 py-1 rounded-full bg-blue-100 text-blue-700 text-sm font-medium">
-            Promedio: <b className="ml-1">{formatearCLP(sugeridas.prom)}</b>
+            Promedio: <b className="ml-1">{convertir(sugeridas.prom)}</b>
           </span>
           <span className="inline-flex items-center px-3 py-1 rounded-full bg-green-100 text-green-700 text-sm font-medium">
-            Máxima: <b className="ml-1">{formatearCLP(sugeridas.max)}</b>
+            Máxima: <b className="ml-1">{convertir(sugeridas.max)}</b>
           </span>
         </div>
       </div>
@@ -436,7 +513,7 @@ export default function Resultado({ resultado, datosOriginales, rubro, experienc
                   <svg className="w-4 h-4 text-red-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10" strokeWidth="2" /><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 8v4m0 4h.01" /></svg>
                 </span>
               </span>
-              <span className="font-semibold text-red-600">{formatearCLP(resultado.desglose.iva)}</span>
+              <span className="font-semibold text-red-600">{convertir(resultado.desglose.iva)}</span>
               <ReactTooltip id="iva-tip" place="right" content="Impuesto al Valor Agregado (19%) que debes agregar a tus servicios si emites factura." />
             </div>
             <div className="flex justify-between items-center p-3 bg-white rounded-lg border-l-4 border-yellow-400">
@@ -446,7 +523,7 @@ export default function Resultado({ resultado, datosOriginales, rubro, experienc
                   <svg className="w-4 h-4 text-yellow-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10" strokeWidth="2" /><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 8v4m0 4h.01" /></svg>
                 </span>
               </span>
-              <span className="font-semibold text-yellow-600">{formatearCLP(resultado.desglose.retencion)}</span>
+              <span className="font-semibold text-yellow-600">{convertir(resultado.desglose.retencion)}</span>
               <ReactTooltip id="retencion-tip" place="right" content="Retención de honorarios (13.75%) que se descuenta automáticamente si emites boleta de honorarios." />
             </div>
             <div className="flex justify-between items-center p-3 bg-white rounded-lg border-l-4 border-blue-400">
@@ -456,7 +533,7 @@ export default function Resultado({ resultado, datosOriginales, rubro, experienc
                   <svg className="w-4 h-4 text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10" strokeWidth="2" /><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 8v4m0 4h.01" /></svg>
                 </span>
               </span>
-              <span className="font-semibold text-blue-600">{formatearCLP(resultado.desglose.cotizacionSalud)}</span>
+              <span className="font-semibold text-blue-600">{convertir(resultado.desglose.cotizacionSalud)}</span>
               <ReactTooltip id="salud-tip" place="right" content="Cotización obligatoria de salud (7%) sobre tus ingresos brutos." />
             </div>
             <div className="flex justify-between items-center p-3 bg-gray-50 rounded-lg border-l-4 border-red-500 mt-4">
@@ -466,7 +543,7 @@ export default function Resultado({ resultado, datosOriginales, rubro, experienc
                   <svg className="w-4 h-4 text-red-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10" strokeWidth="2" /><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 8v4m0 4h.01" /></svg>
                 </span>
               </span>
-              <span className="font-bold text-red-500">{formatearCLP(resultado.desglose.iva + resultado.desglose.retencion + resultado.desglose.cotizacionSalud)}</span>
+              <span className="font-bold text-red-500">{convertir(resultado.desglose.iva + resultado.desglose.retencion + resultado.desglose.cotizacionSalud)}</span>
               <ReactTooltip id="totalimp-tip" place="right" content="Suma de todos los impuestos y cotizaciones obligatorias." />
             </div>
           </div>
@@ -484,7 +561,7 @@ export default function Resultado({ resultado, datosOriginales, rubro, experienc
                   <svg className="w-4 h-4 text-orange-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10" strokeWidth="2" /><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 8v4m0 4h.01" /></svg>
                 </span>
               </span>
-              <span className="font-semibold text-orange-600">{formatearCLP(resultado.desglose.gastosFijos)}</span>
+              <span className="font-semibold text-orange-600">{convertir(resultado.desglose.gastosFijos)}</span>
               <ReactTooltip id="gastosfijos-tip" place="right" content="Gastos fijos mensuales que debes cubrir para mantener tu actividad como freelancer." />
             </div>
             <div className="flex justify-between items-center p-3 bg-gray-50 rounded-lg border-l-4 border-orange-500 mt-4">
@@ -494,7 +571,7 @@ export default function Resultado({ resultado, datosOriginales, rubro, experienc
                   <svg className="w-4 h-4 text-orange-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10" strokeWidth="2" /><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 8v4m0 4h.01" /></svg>
                 </span>
               </span>
-              <span className="font-bold text-orange-500">{formatearCLP(resultado.desglose.iva + resultado.desglose.retencion + resultado.desglose.cotizacionSalud + resultado.desglose.gastosFijos)}</span>
+              <span className="font-bold text-orange-500">{convertir(resultado.desglose.iva + resultado.desglose.retencion + resultado.desglose.cotizacionSalud + resultado.desglose.gastosFijos)}</span>
               <ReactTooltip id="totalgastos-tip" place="right" content="Suma de todos los impuestos, cotizaciones y tus gastos fijos mensuales." />
             </div>
             <hr className="border-gray-300" />
@@ -507,7 +584,7 @@ export default function Resultado({ resultado, datosOriginales, rubro, experienc
               </span>
               <div className="text-right">
                 <span className="text-2xl font-bold text-green-600 block">
-                  {formatearCLP(resultado.ingresosNetos)}
+                  {convertir(resultado.ingresosNetos)}
                 </span>
                 <span className="text-sm text-green-700">
                   ≈ ${ingresosNetosUSD.toFixed(2)} USD

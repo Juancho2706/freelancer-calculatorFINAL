@@ -7,6 +7,7 @@ import Sidebar from '@/components/Sidebar';
 import { formatearCLP } from '@/lib/calculos';
 import Link from 'next/link';
 import ResumenFlujoIngresos from '@/components/ResumenFlujoIngresos';
+import MultiCurrencyDisplay from '@/components/MultiCurrencyDisplay';
 
 interface Calculo {
   id: string;
@@ -265,9 +266,7 @@ export default function HistorialPage() {
                       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                         <div>
                           <p className="text-sm text-gray-600">Tarifa por hora</p>
-                          <p className="font-semibold text-gray-900">
-                            {calculo.result && typeof calculo.result.tarifaHora === 'number' ? formatearCLP(calculo.result.tarifaHora) : 'N/A'}
-                          </p>
+                          <MultiCurrencyDisplay valueCLP={calculo.result.tarifaHora} className="text-xs mt-2" />
                         </div>
                         <div>
                           <p className="text-sm text-gray-600">
@@ -275,15 +274,11 @@ export default function HistorialPage() {
                               ? `Tarifa por proyecto (${calculo.proyecto.horasTotales}h)` 
                               : 'Tarifa por proyecto (40h)'}
                           </p>
-                          <p className="font-semibold text-gray-900">
-                            {calculo.result && typeof calculo.result.tarifaProyecto === 'number' ? formatearCLP(calculo.result.tarifaProyecto) : 'N/A'}
-                          </p>
+                          <MultiCurrencyDisplay valueCLP={calculo.result.tarifaProyecto} className="text-xs mt-2" />
                         </div>
                         <div>
                           <p className="text-sm text-gray-600">Ingresos netos</p>
-                          <p className="font-semibold text-green-600">
-                            {calculo.result && typeof calculo.result.ingresosNetos === 'number' ? formatearCLP(calculo.result.ingresosNetos) : 'N/A'}
-                          </p>
+                          <MultiCurrencyDisplay valueCLP={calculo.result.ingresosNetos} className="text-xs mt-2" />
                         </div>
                       </div>
                     </div>

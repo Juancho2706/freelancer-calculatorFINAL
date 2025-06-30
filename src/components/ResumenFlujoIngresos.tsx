@@ -1,6 +1,7 @@
 import React from 'react';
 import { Tooltip } from 'react-tooltip';
 import { formatearCLP } from '@/lib/calculos';
+import MultiCurrencyDisplay from './MultiCurrencyDisplay';
 
 interface ResumenFlujoIngresosProps {
   ingresosNetos: number;
@@ -46,6 +47,9 @@ const ResumenFlujoIngresos: React.FC<ResumenFlujoIngresosProps> = ({ ingresosNet
           <span className="text-xl font-bold text-green-600">
             {formatearCLP(ingresosNetos)}
           </span>
+        </div>
+        <div className="mt-2">
+          <MultiCurrencyDisplay valueCLP={ingresosNetos} className="text-xs" />
         </div>
       </div>
     </div>

@@ -5,6 +5,7 @@ import { notFound } from 'next/navigation';
 import Resultado from '../../../../components/Resultado';
 import React, { useState, useEffect, use } from 'react';
 import jsPDF from 'jspdf';
+import MultiCurrencyDisplay from '@/components/MultiCurrencyDisplay';
 
 interface CalculoDetallePageProps {
   params: Promise<{ id: string }>;

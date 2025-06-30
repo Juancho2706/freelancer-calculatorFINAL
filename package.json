@@ -6,13 +6,16 @@
     "dev": "next dev --turbopack",
     "build": "next build",
     "start": "next start",
-    "lint": "next lint"
+    "lint": "next lint",
+    "update-dolar": "npx ts-node scripts/update-exchange-rate.ts",
+    "check-dolar": "curl -X GET http://localhost:3000/api/update-exchange-rate"
   },
   "dependencies": {
     "@supabase/auth-helpers-nextjs": "^0.10.0",
     "@supabase/ssr": "^0.6.1",
     "@supabase/supabase-js": "^2.50.2",
     "chart.js": "^4.5.0",
+    "dotenv": "^17.0.0",
     "html2canvas": "^1.4.1",
     "jspdf": "^3.0.1",
     "next": "15.3.4",
@@ -30,6 +33,7 @@
     "eslint": "^9",
     "eslint-config-next": "15.3.4",
     "tailwindcss": "^4",
+    "ts-node": "^10.9.2",
     "typescript": "^5"
   }
 }

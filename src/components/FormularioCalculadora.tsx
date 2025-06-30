@@ -6,6 +6,7 @@ import { VALORES_DEFAULT, MENSAJES } from '@/utils/constants';
 import { guardarCalculo } from '@/lib/supabase';
 import { useAuth } from '@/contexts/AuthContext';
 import Resultado from './Resultado';
+import ApiInfoWidget from './ApiInfoWidget';
 import { Tooltip } from 'react-tooltip';
 import { useSearchParams } from 'next/navigation';
 
@@ -15,6 +16,7 @@ interface ErroresValidacion {
   horasPorDia?: string;
   gastosFijos?: string;
   titulo?: string;
+  general?: string;
 }
 
 interface DatosCalculoConTitulo extends DatosCalculo {
@@ -71,6 +73,10 @@ export default function FormularioCalculadora() {
   });
   const [rubro, setRubro] = useState('diseño');
   const [experiencia, setExperiencia] = useState('junior');
+  const [apiInfo, setApiInfo] = useState<{
+    impuestos?: { fecha_actualizacion: string };
+    tipo_cambio?: { fecha: string; fuente: string };
+  }>({});
 
   // Inicializar desde query params si existen (solo en el primer render)
   useEffect(() => {
@@ -217,49 +223,98 @@ export default function FormularioCalculadora() {
 
     // Validar campos del proyecto si está en modo proyecto
     if (modoProyecto) {
-      const camposProyecto = ['nombre', 'horasTotales', 'duracion', 'entregables'];
-      camposProyecto.forEach((campo) => {
-        const error = validarCampoProyecto(campo, proyecto[campo as keyof typeof proyecto]);
-        if (error) {
-          // Agregar error al estado de errores del proyecto
-          setErroresProyecto(prev => ({
-            ...prev,
-            [campo]: error,
-          }));
-          esValido = false;
-        }
-      });
+      const erroresProyecto = validarProyecto();
+      if (Object.keys(erroresProyecto).length > 0) {
+        setErroresProyecto(erroresProyecto);
+        esValido = false;
+      }
     }
 
     setErrores(nuevosErrores);
     return esValido;
   };
 
+  // Validar campos del proyecto si está en modo proyecto
+  const validarProyecto = (): {[key: string]: string} => {
+    const errores: {[key: string]: string} = {};
+    
+    if (proyecto.nombre.trim().length < 3) {
+      errores.nombre = 'El nombre del proyecto debe tener al menos 3 caracteres';
+    }
+    
+    if (!proyecto.horasTotales || Number(proyecto.horasTotales) <= 0) {
+      errores.horasTotales = 'Las horas totales deben ser mayores a 0';
+    }
+    
+    if (!proyecto.duracion || Number(proyecto.duracion) <= 0) {
+      errores.duracion = 'La duración debe ser mayor a 0';
+    }
+    
+    if (!proyecto.entregables || Number(proyecto.entregables) <= 0) {
+      errores.entregables = 'El número de entregables debe ser mayor a 0';
+    }
+    
+    // presupuesto es opcional, pero si se ingresa debe ser positivo
+    if (proyecto.presupuesto && Number(proyecto.presupuesto) <= 0) {
+      errores.presupuesto = 'El presupuesto debe ser mayor a 0';
+    }
+    
+    return errores;
+  };
+
   // NUEVO: función para calcular según modo
-  const calcularResultado = () => {
+  const calcularResultado = async (): Promise<ResultadoCalculo> => {
     if (!modoProyecto) {
       // Modo tarifa por hora normal - cálculo mensual
-      return calcularTarifa(datos);
+      const resultado = await calcularTarifa(datos);
+      
+      // Guardar información de las APIs utilizadas
+      if (resultado.metadata) {
+        setApiInfo({
+          impuestos: resultado.metadata.impuestos,
+          tipo_cambio: resultado.metadata.tipo_cambio,
+        });
+      }
+      
+      return resultado;
     } else {
       // Modo proyecto - cálculo de rentabilidad y desglose real
       const horasTotales = Number(proyecto.horasTotales) || 1;
       const presupuestoProyecto = Number(proyecto.presupuesto) || 0;
-      const resultadoBase = calcularTarifa(datos);
+      const resultadoBase = await calcularTarifa(datos);
       const tarifaHoraNecesaria = resultadoBase.tarifaHora;
       const precioRecomendado = Math.round(tarifaHoraNecesaria * horasTotales);
+      
       // Usar presupuesto si existe, si no, recomendado
       const montoProyecto = presupuestoProyecto > 0 ? presupuestoProyecto : precioRecomendado;
+      
+      // Obtener impuestos actuales para el cálculo del proyecto
+      const impuestos = resultadoBase.metadata?.impuestos || {
+        iva: 0.19,
+        retencion_boleta: 0.1375,
+        cotizacion_salud: 0.07,
+        fecha_actualizacion: new Date().toISOString(),
+      };
+      
       // Calcular impuestos y gastos sobre el monto del proyecto
-      const iva = Math.round(montoProyecto * 0.19);
-      const retencion = Math.round(montoProyecto * 0.1375);
-      const cotizacionSalud = Math.round(montoProyecto * 0.07);
+      const iva = Math.round(montoProyecto * impuestos.iva);
+      const retencion = Math.round(montoProyecto * impuestos.retencion_boleta);
+      const cotizacionSalud = Math.round(montoProyecto * impuestos.cotizacion_salud);
       const gastosFijos = datos.gastosFijos;
       const totalImpuestosYGastos = iva + retencion + cotizacionSalud + gastosFijos;
       const ingresosNetos = montoProyecto - totalImpuestosYGastos;
+      
       // Rentabilidad
       const ganancia = presupuestoProyecto > 0 ? presupuestoProyecto - precioRecomendado : 0;
       const rentabilidad = presupuestoProyecto > 0 ? (ganancia / presupuestoProyecto) * 100 : 0;
       const tarifaHoraEfectiva = presupuestoProyecto > 0 ? presupuestoProyecto / horasTotales : tarifaHoraNecesaria;
+      
+      // Guardar información de las APIs utilizadas
+      setApiInfo({
+        impuestos: resultadoBase.metadata?.impuestos,
+        tipo_cambio: resultadoBase.metadata?.tipo_cambio,
+      });
+      
       return {
         tarifaHora: Math.round(tarifaHoraEfectiva),
         tarifaProyecto: montoProyecto,
@@ -270,6 +325,7 @@ export default function FormularioCalculadora() {
           cotizacionSalud,
           gastosFijos,
         },
+        metadata: resultadoBase.metadata,
         proyecto: {
           precioRecomendado,
           ganancia,
@@ -278,6 +334,36 @@ export default function FormularioCalculadora() {
           horasTotales,
         }
       };
+    }
+  };
+
+  const handleCalcular = async () => {
+    const validacion = validarDatosCalculo(datos);
+    if (!validacion.esValido) {
+      setErrores(validacion.errores.reduce((acc, error) => ({ ...acc, general: error }), {}));
+      return;
+    }
+
+    if (modoProyecto) {
+      const erroresProyecto = validarProyecto();
+      if (Object.keys(erroresProyecto).length > 0) {
+        setErroresProyecto(erroresProyecto);
+        return;
+      }
+    }
+
+    setErrores({});
+    setErroresProyecto({});
+    setIsCalculando(true);
+
+    try {
+      const resultadoCalculado = await calcularResultado();
+      setResultado(resultadoCalculado);
+    } catch (error) {
+      console.error('Error al calcular:', error);
+      setErrores({ general: 'Error al realizar el cálculo. Inténtalo de nuevo.' });
+    } finally {
+      setIsCalculando(false);
     }
   };
 
@@ -296,7 +382,7 @@ export default function FormularioCalculadora() {
       await new Promise(resolve => setTimeout(resolve, 500));
       
       // Usar la nueva función diferenciada según el modo
-      const resultadoCalculo = calcularResultado();
+      const resultadoCalculo = await calcularResultado();
       setResultado(resultadoCalculo);
       
       // Guardar en Supabase solo si el usuario está autenticado
@@ -634,6 +720,14 @@ export default function FormularioCalculadora() {
       {/* Resultado */}
       {resultado && (
         <Resultado resultado={resultado} datosOriginales={datos} rubro={rubro} experiencia={experiencia} modoProyecto={modoProyecto} proyecto={proyecto} />
+      )}
+
+      {/* Información de APIs utilizadas */}
+      {resultado && apiInfo && (
+        <ApiInfoWidget 
+          impuestos={apiInfo.impuestos}
+          tipo_cambio={apiInfo.tipo_cambio}
+        />
       )}
     </div>
   );

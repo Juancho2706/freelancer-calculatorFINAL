@@ -285,14 +285,27 @@ export async function getRecommendedTemplates(): Promise<CalculationTemplate[]> 
     const { data: { user } } = await supabase.auth.getUser();
     if (!user) return [];
 
-    // Obtener preferencias del usuario
-    const { data: preferences } = await supabase
-      .from('user_preferences')
-      .select('rubro, experiencia')
-      .eq('user_id', user.id)
-      .single();
+    // Obtener preferencias del usuario con manejo de errores
+    let preferences = null;
+    try {
+      const { data: prefsData, error: prefsError } = await supabase
+        .from('user_preferences')
+        .select('rubro, experiencia')
+        .eq('user_id', user.id)
+        .single();
 
-    if (!preferences) return [];
+      if (!prefsError && prefsData) {
+        preferences = prefsData;
+      }
+    } catch (error) {
+      console.warn('No se pudieron obtener las preferencias del usuario:', error);
+      // Continuar sin preferencias
+    }
+
+    // Si no hay preferencias, retornar templates populares
+    if (!preferences) {
+      return getPopularTemplates(5);
+    }
 
     // Obtener templates que coincidan con las preferencias
     const { data, error } = await supabase
@@ -304,11 +317,26 @@ export async function getRecommendedTemplates(): Promise<CalculationTemplate[]> 
       .order('usage_count', { ascending: false })
       .limit(5);
 
-    if (error) throw error;
-    return data || [];
+    if (error) {
+      console.warn('Error obteniendo templates recomendados, usando populares:', error);
+      return getPopularTemplates(5);
+    }
+
+    // Si no hay templates específicos, usar populares
+    if (!data || data.length === 0) {
+      return getPopularTemplates(5);
+    }
+
+    return data;
   } catch (error) {
     console.error('Error fetching recommended templates:', error);
-    return [];
+    // En caso de error, retornar templates populares
+    try {
+      return await getPopularTemplates(5);
+    } catch (fallbackError) {
+      console.error('Error en fallback de templates populares:', fallbackError);
+      return [];
+    }
   }
 }
 

@@ -5,6 +5,7 @@ import { useAuth } from '@/contexts/AuthContext';
 import { supabase } from '@/lib/supabase-config';
 import Sidebar from '@/components/Sidebar';
 import { useRouter } from 'next/navigation';
+import MultiCurrencyDisplay from '@/components/MultiCurrencyDisplay';
 
 interface UserStats {
   totalCalculos: number;
@@ -279,6 +280,7 @@ export default function PerfilPage() {
               <h3 className="text-lg font-semibold text-gray-900">Promedio Tarifa por Hora</h3>
             </div>
             <p className="text-3xl font-bold text-blue-600 mb-2">{formatearCLP(stats.promedioTarifaHora)}</p>
+            <MultiCurrencyDisplay valueCLP={stats.promedioTarifaHora} className="text-xs mt-2" />
             <p className="text-sm text-gray-500">Basado en tus cálculos de tarifa por hora</p>
           </div>
 
@@ -292,6 +294,7 @@ export default function PerfilPage() {
               <h3 className="text-lg font-semibold text-gray-900">Promedio por Proyecto</h3>
             </div>
             <p className="text-3xl font-bold text-green-600 mb-2">{formatearCLP(stats.promedioProyecto)}</p>
+            <MultiCurrencyDisplay valueCLP={stats.promedioProyecto} className="text-xs mt-2" />
             <p className="text-sm text-gray-500">Ingresos netos promedio por proyecto</p>
           </div>
         </div>
