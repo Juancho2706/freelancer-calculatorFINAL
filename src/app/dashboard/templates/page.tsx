@@ -32,6 +32,7 @@ export default function TemplatesPage() {
   const [showCreateModal, setShowCreateModal] = useState(false);
   const [editTemplate, setEditTemplate] = useState<CalculationTemplate | null>(null);
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
+  const [templateResults, setTemplateResults] = useState<Record<string, ResultadoCalculo | null>>({});
 
   useEffect(() => {
     if (user) {
@@ -192,6 +193,24 @@ export default function TemplatesPage() {
     }
   };
 
+  // Calcular resultados de todos los templates personalizados al cargar o cambiar myTemplates
+  useEffect(() => {
+    const calcularTodos = async () => {
+      const results: Record<string, ResultadoCalculo | null> = {};
+      for (const template of templates.filter(t => !t.is_default && t.created_by === user?.id)) {
+        const datos: DatosCalculo = {
+          ingresosDeseados: Number(template.config.ingresosDeseados) || 0,
+          diasTrabajados: Number(template.config.diasTrabajados) || 0,
+          horasPorDia: Number(template.config.horasPorDia) || 0,
+          gastosFijos: Number(template.config.gastosFijos) || 0,
+        };
+        results[template.id] = await calcularTarifa(datos);
+      }
+      setTemplateResults(results);
+    };
+    calcularTodos();
+  }, [templates, user]);
+
   if (!user) {
     return (
       <div className="min-h-screen bg-gray-50 flex items-center justify-center">
@@ -208,7 +227,7 @@ export default function TemplatesPage() {
   const defaultTemplates = templates.filter(t => t.is_default);
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-white dark:bg-gray-900 text-gray-900 dark:text-white">
       <Sidebar />
       <CreateTemplateModal
         isOpen={showCreateModal || isEditModalOpen}
@@ -237,7 +256,7 @@ export default function TemplatesPage() {
           </div>
 
           {/* Tabs */}
-          <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100 mb-8">
+          <div className="bg-white dark:bg-gray-800 rounded-2xl p-6 shadow-sm border border-gray-100 dark:border-gray-800 mb-8">
             <div className="flex flex-wrap gap-2 mb-6">
               {[
                 { key: 'all', label: 'Todos los Templates' },
@@ -350,20 +369,11 @@ export default function TemplatesPage() {
                 ) : (
                   <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                     {myTemplates.map((template) => {
-                      const [resultado, setResultado] = useState<ResultadoCalculo | null>(null);
-                      useEffect(() => {
-                        const datos: DatosCalculo = {
-                          ingresosDeseados: Number(template.config.ingresosDeseados) || 0,
-                          diasTrabajados: Number(template.config.diasTrabajados) || 0,
-                          horasPorDia: Number(template.config.horasPorDia) || 0,
-                          gastosFijos: Number(template.config.gastosFijos) || 0,
-                        };
-                        calcularTarifa(datos).then(setResultado);
-                      }, [template.config]);
+                      const resultado = templateResults[template.id] || null;
                       return (
                         <div
                           key={template.id}
-                          className="bg-white rounded-2xl p-6 shadow-sm border border-gray-200 hover:shadow-md transition-all duration-200"
+                          className="bg-white dark:bg-gray-800 rounded-2xl p-6 shadow-sm border border-gray-200 dark:border-gray-800 hover:shadow-md transition-all duration-200"
                         >
                           <div className="flex items-start justify-between mb-4">
                             <div className="flex items-center space-x-2">
@@ -483,7 +493,7 @@ export default function TemplatesPage() {
                   {defaultTemplates.map((template) => (
                     <div
                       key={template.id}
-                      className="bg-white rounded-2xl p-6 shadow-sm border border-gray-200 hover:shadow-md transition-all duration-200"
+                      className="bg-white dark:bg-gray-800 rounded-2xl p-6 shadow-sm border border-gray-200 dark:border-gray-800 hover:shadow-md transition-all duration-200"
                     >
                       <div className="flex items-start justify-between mb-4">
                         <div className="flex items-center space-x-2">

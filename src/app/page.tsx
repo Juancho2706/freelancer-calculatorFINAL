@@ -15,9 +15,9 @@ export default function Home() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-100">
+    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-100 dark:from-slate-900 dark:via-blue-950 dark:to-indigo-950 transition-colors">
       {/* Header */}
-      <header className="bg-white/80 backdrop-blur-sm border-b border-gray-200/50 sticky top-0 z-50">
+      <header className="bg-white/80 dark:bg-gray-900/80 backdrop-blur-sm border-b border-gray-200/50 dark:border-gray-700/50 sticky top-0 z-50 transition-colors">
         <div className="container mx-auto px-4 py-4">
           <div className="flex items-center justify-between">
             <Link href="/" className="flex items-center space-x-3">
@@ -26,14 +26,14 @@ export default function Home() {
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 7h6m0 10v-3m-3 3h.01M9 17h.01M9 14h.01M12 14h.01M15 11h.01M12 11h.01M9 11h.01M7 21h10a2 2 0 002-2V5a2 2 0 00-2-2H7a2 2 0 00-2 2v14a2 2 0 002 2z" />
                 </svg>
               </div>
-              <span className="text-2xl font-bold bg-gradient-to-r from-gray-900 to-gray-600 bg-clip-text text-transparent">
+              <span className="text-2xl font-bold bg-gradient-to-r from-gray-900 to-gray-600 dark:from-white dark:to-gray-300 bg-clip-text text-transparent transition-colors">
                 Freelancer Chile
               </span>
             </Link>
             <div className="flex items-center space-x-4">
               {user ? (
                 <div className="flex items-center space-x-4">
-                  <span className="text-gray-600">
+                  <span className="text-gray-600 dark:text-gray-300 transition-colors">
                     Hola, {user.user_metadata?.full_name || user.email}
                   </span>
                   <button
@@ -62,15 +62,15 @@ export default function Home() {
           <div className="max-w-4xl mx-auto text-center">
             {user ? (
               <>
-                <h1 className="text-5xl md:text-7xl font-bold text-gray-900 mb-6 leading-tight">
+                <h1 className="text-5xl md:text-7xl font-bold text-gray-900 dark:text-white mb-6 leading-tight transition-colors">
                   ¡Bienvenido de vuelta,{' '}
                   <span className="bg-gradient-to-r from-blue-600 to-indigo-600 bg-clip-text text-transparent">
                     {user.user_metadata?.full_name?.split(' ')[0] || 'Freelancer'}!
                   </span>
                 </h1>
-                <p className="text-xl md:text-2xl text-gray-600 mb-8 leading-relaxed">
+                <p className="text-xl md:text-2xl text-gray-600 dark:text-gray-300 mb-8 leading-relaxed transition-colors">
                   ¿Listo para calcular tu próxima tarifa o simular un proyecto? 
-                  <span className="font-semibold text-gray-800"> Accede a tu dashboard.</span>
+                  <span className="font-semibold text-gray-800 dark:text-gray-200"> Accede a tu dashboard.</span>
                 </p>
                 <div className="flex flex-col sm:flex-row gap-4 justify-center">
                   <button
@@ -84,7 +84,7 @@ export default function Home() {
                   </button>
                   <Link
                     href="/calculadora"
-                    className="bg-white hover:bg-gray-50 text-gray-700 px-8 py-4 rounded-2xl font-semibold text-lg transition-all duration-200 shadow-lg hover:shadow-xl border border-gray-200 inline-flex items-center justify-center"
+                    className="bg-white dark:bg-gray-800 hover:bg-gray-50 dark:hover:bg-gray-700 text-gray-700 dark:text-gray-200 px-8 py-4 rounded-2xl font-semibold text-lg transition-all duration-200 shadow-lg hover:shadow-xl border border-gray-200 dark:border-gray-600 inline-flex items-center justify-center"
                   >
                     <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
@@ -95,17 +95,17 @@ export default function Home() {
               </>
             ) : (
               <>
-                <h1 className="text-5xl md:text-7xl font-bold text-gray-900 mb-6 leading-tight">
+                <h1 className="text-5xl md:text-7xl font-bold text-gray-900 dark:text-white mb-6 leading-tight transition-colors">
                   Calcula tu{' '}
                   <span className="bg-gradient-to-r from-blue-600 to-indigo-600 bg-clip-text text-transparent">
                     valor real
                   </span>{' '}
                   como freelancer
                 </h1>
-                <p className="text-xl md:text-2xl text-gray-600 mb-8 leading-relaxed">
+                <p className="text-xl md:text-2xl text-gray-600 dark:text-gray-300 mb-8 leading-relaxed transition-colors">
                   Descubre cuánto deberías cobrar considerando impuestos chilenos, 
                   gastos fijos y cotizaciones previsionales. 
-                  <span className="font-semibold text-gray-800"> En segundos.</span>
+                  <span className="font-semibold text-gray-800 dark:text-gray-200"> En segundos.</span>
                 </p>
                 <div className="flex flex-col sm:flex-row gap-4 justify-center">
                   <Link
@@ -119,7 +119,7 @@ export default function Home() {
                   </Link>
                   <Link
                     href="/auth"
-                    className="bg-white hover:bg-gray-50 text-gray-700 px-8 py-4 rounded-2xl font-semibold text-lg transition-all duration-200 shadow-lg hover:shadow-xl border border-gray-200 inline-flex items-center justify-center"
+                    className="bg-white dark:bg-gray-800 hover:bg-gray-50 dark:hover:bg-gray-700 text-gray-700 dark:text-gray-200 px-8 py-4 rounded-2xl font-semibold text-lg transition-all duration-200 shadow-lg hover:shadow-xl border border-gray-200 dark:border-gray-600 inline-flex items-center justify-center"
                   >
                     Crear cuenta
                   </Link>
@@ -130,18 +130,18 @@ export default function Home() {
         </div>
         
         {/* Decorative elements */}
-        <div className="absolute top-20 left-10 w-20 h-20 bg-blue-200 rounded-full opacity-20 animate-pulse"></div>
-        <div className="absolute bottom-20 right-10 w-32 h-32 bg-indigo-200 rounded-full opacity-20 animate-pulse delay-1000"></div>
+        <div className="absolute top-20 left-10 w-20 h-20 bg-blue-200 dark:bg-blue-800 rounded-full opacity-20 animate-pulse transition-colors"></div>
+        <div className="absolute bottom-20 right-10 w-32 h-32 bg-indigo-200 dark:bg-indigo-800 rounded-full opacity-20 animate-pulse delay-1000 transition-colors"></div>
       </section>
 
       {/* Modes Section */}
-      <section className="py-20 bg-white">
+      <section className="py-20 bg-white dark:bg-gray-900 transition-colors">
         <div className="container mx-auto px-4">
           <div className="text-center mb-16">
-            <h2 className="text-4xl font-bold text-gray-900 mb-4">
+            <h2 className="text-4xl font-bold text-gray-900 dark:text-white mb-4 transition-colors">
               Dos modos de cálculo para tu flexibilidad
             </h2>
-            <p className="text-xl text-gray-600 max-w-3xl mx-auto">
+            <p className="text-xl text-gray-600 dark:text-gray-300 max-w-3xl mx-auto transition-colors">
               Calcula tu tarifa por hora o simula proyectos completos. 
               Ambos modos consideran impuestos chilenos y te dan recomendaciones personalizadas.
             </p>
@@ -149,7 +149,7 @@ export default function Home() {
           
           <div className="grid lg:grid-cols-2 gap-12 max-w-6xl mx-auto">
             {/* Tarifa por Hora */}
-            <div className="bg-gradient-to-br from-blue-50 to-indigo-50 p-8 rounded-3xl border border-blue-100 relative overflow-hidden">
+            <div className="bg-gradient-to-br from-blue-50 to-indigo-50 dark:from-blue-950 dark:to-indigo-950 p-8 rounded-3xl border border-blue-100 dark:border-blue-800 relative overflow-hidden transition-colors">
               <div className="absolute top-4 right-4">
                 <div className="bg-blue-600 text-white px-3 py-1 rounded-full text-sm font-medium">
                   Tarifa por Hora
@@ -160,38 +160,38 @@ export default function Home() {
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
                 </svg>
               </div>
-              <h3 className="text-2xl font-bold text-gray-900 mb-4">Tarifa por Hora</h3>
-              <p className="text-gray-600 mb-6 leading-relaxed">
+              <h3 className="text-2xl font-bold text-gray-900 dark:text-white mb-4 transition-colors">Tarifa por Hora</h3>
+              <p className="text-gray-600 dark:text-gray-300 mb-6 leading-relaxed transition-colors">
                 Calcula cuánto deberías cobrar por hora para alcanzar tus ingresos deseados, 
                 considerando días trabajados, gastos fijos e impuestos.
               </p>
               <div className="space-y-3 mb-6">
                 <div className="flex items-center space-x-3">
                   <div className="w-2 h-2 bg-blue-600 rounded-full"></div>
-                  <span className="text-gray-700">Ingresos deseados mensuales</span>
+                  <span className="text-gray-700 dark:text-gray-300 transition-colors">Ingresos deseados mensuales</span>
                 </div>
                 <div className="flex items-center space-x-3">
                   <div className="w-2 h-2 bg-blue-600 rounded-full"></div>
-                  <span className="text-gray-700">Días y horas trabajadas</span>
+                  <span className="text-gray-700 dark:text-gray-300 transition-colors">Días y horas trabajadas</span>
                 </div>
                 <div className="flex items-center space-x-3">
                   <div className="w-2 h-2 bg-blue-600 rounded-full"></div>
-                  <span className="text-gray-700">Gastos fijos incluidos</span>
+                  <span className="text-gray-700 dark:text-gray-300 transition-colors">Gastos fijos incluidos</span>
                 </div>
                 <div className="flex items-center space-x-3">
                   <div className="w-2 h-2 bg-blue-600 rounded-full"></div>
-                  <span className="text-gray-700">Tarifa por hora resultante</span>
+                  <span className="text-gray-700 dark:text-gray-300 transition-colors">Tarifa por hora resultante</span>
                 </div>
               </div>
-              <div className="bg-white rounded-2xl p-4 border border-blue-200">
-                <div className="text-sm text-gray-600 mb-2">Ejemplo de resultado:</div>
+              <div className="bg-white dark:bg-gray-800 rounded-2xl p-4 border border-blue-200 dark:border-blue-700 transition-colors">
+                <div className="text-sm text-gray-600 dark:text-gray-400 mb-2 transition-colors">Ejemplo de resultado:</div>
                 <div className="text-2xl font-bold text-blue-600">$45.000 CLP/hora</div>
-                <div className="text-sm text-gray-500">Para $2.500.000 CLP mensuales</div>
+                <div className="text-sm text-gray-500 dark:text-gray-400 transition-colors">Para $2.500.000 CLP mensuales</div>
               </div>
             </div>
 
             {/* Simulación de Proyecto */}
-            <div className="bg-gradient-to-br from-green-50 to-emerald-50 p-8 rounded-3xl border border-green-100 relative overflow-hidden">
+            <div className="bg-gradient-to-br from-green-50 to-emerald-50 dark:from-green-950 dark:to-emerald-950 p-8 rounded-3xl border border-green-100 dark:border-green-800 relative overflow-hidden transition-colors">
               <div className="absolute top-4 right-4">
                 <div className="bg-green-600 text-white px-3 py-1 rounded-full text-sm font-medium">
                   Simular Proyecto
@@ -199,36 +199,36 @@ export default function Home() {
               </div>
               <div className="w-16 h-16 bg-green-600 rounded-2xl flex items-center justify-center mb-6">
                 <svg className="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5H7a2 2 0 00-2 2v10a2 2 0 002 2h8a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
                 </svg>
               </div>
-              <h3 className="text-2xl font-bold text-gray-900 mb-4">Simular Proyecto</h3>
-              <p className="text-gray-600 mb-6 leading-relaxed">
+              <h3 className="text-2xl font-bold text-gray-900 dark:text-white mb-4 transition-colors">Simular Proyecto</h3>
+              <p className="text-gray-600 dark:text-gray-300 mb-6 leading-relaxed transition-colors">
                 Simula proyectos completos con presupuesto fijo y horas estimadas. 
                 Descubre tu rentabilidad real y margen de ganancia.
               </p>
               <div className="space-y-3 mb-6">
                 <div className="flex items-center space-x-3">
                   <div className="w-2 h-2 bg-green-600 rounded-full"></div>
-                  <span className="text-gray-700">Presupuesto del proyecto</span>
+                  <span className="text-gray-700 dark:text-gray-300 transition-colors">Presupuesto del proyecto</span>
                 </div>
                 <div className="flex items-center space-x-3">
                   <div className="w-2 h-2 bg-green-600 rounded-full"></div>
-                  <span className="text-gray-700">Horas estimadas de trabajo</span>
+                  <span className="text-gray-700 dark:text-gray-300 transition-colors">Horas estimadas de trabajo</span>
                 </div>
                 <div className="flex items-center space-x-3">
                   <div className="w-2 h-2 bg-green-600 rounded-full"></div>
-                  <span className="text-gray-700">Gastos y costos asociados</span>
+                  <span className="text-gray-700 dark:text-gray-300 transition-colors">Gastos y costos asociados</span>
                 </div>
                 <div className="flex items-center space-x-3">
                   <div className="w-2 h-2 bg-green-600 rounded-full"></div>
-                  <span className="text-gray-700">Rentabilidad y margen</span>
+                  <span className="text-gray-700 dark:text-gray-300 transition-colors">Rentabilidad y margen</span>
                 </div>
               </div>
-              <div className="bg-white rounded-2xl p-4 border border-green-200">
-                <div className="text-sm text-gray-600 mb-2">Ejemplo de resultado:</div>
+              <div className="bg-white dark:bg-gray-800 rounded-2xl p-4 border border-green-200 dark:border-green-700 transition-colors">
+                <div className="text-sm text-gray-600 dark:text-gray-400 mb-2 transition-colors">Ejemplo de resultado:</div>
                 <div className="text-2xl font-bold text-green-600">$850.000 CLP</div>
-                <div className="text-sm text-gray-500">Ingresos netos del proyecto</div>
+                <div className="text-sm text-gray-500 dark:text-gray-400 transition-colors">Ingresos netos del proyecto</div>
               </div>
             </div>
           </div>
@@ -236,62 +236,62 @@ export default function Home() {
       </section>
 
       {/* Features Section */}
-      <section className="py-20 bg-gradient-to-br from-gray-50 to-blue-50">
+      <section className="py-20 bg-gray-50 dark:bg-gray-800 transition-colors">
         <div className="container mx-auto px-4">
           <div className="text-center mb-16">
-            <h2 className="text-4xl font-bold text-gray-900 mb-4">
+            <h2 className="text-4xl font-bold text-gray-900 dark:text-white mb-4 transition-colors">
               Características avanzadas para freelancers profesionales
             </h2>
-            <p className="text-xl text-gray-600 max-w-3xl mx-auto">
+            <p className="text-xl text-gray-600 dark:text-gray-300 max-w-3xl mx-auto transition-colors">
               Nuestra calculadora incluye herramientas inteligentes para ayudarte a tomar decisiones informadas
             </p>
           </div>
           
           <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-8">
-            <div className="bg-white p-8 rounded-2xl shadow-sm border border-gray-100">
+            <div className="bg-white dark:bg-gray-900 p-8 rounded-2xl shadow-sm border border-gray-100">
               <div className="w-12 h-12 bg-blue-600 rounded-xl flex items-center justify-center mb-6">
                 <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1" />
                 </svg>
               </div>
-              <h3 className="text-xl font-semibold text-gray-900 mb-3">Impuestos chilenos</h3>
-              <p className="text-gray-600">
+              <h3 className="text-xl font-semibold text-gray-900 dark:text-white mb-3">Impuestos chilenos</h3>
+              <p className="text-gray-600 dark:text-gray-300">
                 IVA 19%, retención 13.75% y cotización de salud 7% calculados automáticamente
               </p>
             </div>
             
-            <div className="bg-white p-8 rounded-2xl shadow-sm border border-gray-100">
+            <div className="bg-white dark:bg-gray-900 p-8 rounded-2xl shadow-sm border border-gray-100">
               <div className="w-12 h-12 bg-green-600 rounded-xl flex items-center justify-center mb-6">
                 <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
                 </svg>
               </div>
-              <h3 className="text-xl font-semibold text-gray-900 mb-3">Recomendaciones inteligentes</h3>
-              <p className="text-gray-600">
+              <h3 className="text-xl font-semibold text-gray-900 dark:text-white mb-3">Recomendaciones inteligentes</h3>
+              <p className="text-gray-600 dark:text-gray-300">
                 Tarifas sugeridas según tu rubro, experiencia y comparativas de mercado
               </p>
             </div>
             
-            <div className="bg-white p-8 rounded-2xl shadow-sm border border-gray-100">
+            <div className="bg-white dark:bg-gray-900 p-8 rounded-2xl shadow-sm border border-gray-100">
               <div className="w-12 h-12 bg-purple-600 rounded-xl flex items-center justify-center mb-6">
                 <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
                 </svg>
               </div>
-              <h3 className="text-xl font-semibold text-gray-900 mb-3">Tooltips explicativos</h3>
-              <p className="text-gray-600">
+              <h3 className="text-xl font-semibold text-gray-900 dark:text-white mb-3">Tooltips explicativos</h3>
+              <p className="text-gray-600 dark:text-gray-300">
                 Información detallada en cada campo para entender mejor los cálculos
               </p>
             </div>
 
-            <div className="bg-white p-8 rounded-2xl shadow-sm border border-gray-100">
+            <div className="bg-white dark:bg-gray-900 p-8 rounded-2xl shadow-sm border border-gray-100">
               <div className="w-12 h-12 bg-orange-600 rounded-xl flex items-center justify-center mb-6">
                 <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
                 </svg>
               </div>
-              <h3 className="text-xl font-semibold text-gray-900 mb-3">Exportar a PDF</h3>
-              <p className="text-gray-600">
+              <h3 className="text-xl font-semibold text-gray-900 dark:text-white mb-3">Exportar a PDF</h3>
+              <p className="text-gray-600 dark:text-gray-300">
                 Genera propuestas profesionales para compartir con tus clientes
               </p>
             </div>
